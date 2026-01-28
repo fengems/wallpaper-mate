@@ -33,3 +33,9 @@
 - Tauri init 使用 `--ci` 参数可以跳过交互式提示
 - 需要手动创建目录结构，即使 Tauri init 创建了部分目录
 - 配置 identifier 为 `com.wallpapermate.app` 用于 macOS 应用识别
+
+### Task 2 学习心得
+- Vitest 4.x 使用 jsdom 作为环境，配置在 vitest.config.ts
+- 测试 setup 文件可以配置 globals 和测试环境
+- Rust 测试使用 `#[cfg(test)]` 模块和 `#[test]` 属性
+- 需要确保 Rust 工具链已安装才能运行 cargo test
