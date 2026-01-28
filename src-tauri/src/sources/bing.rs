@@ -12,6 +12,7 @@ struct BingResponse {
 struct BingImage {
     url: String,
     title: String,
+    #[allow(dead_code)]
     copyright: String,
 }
 

@@ -2,7 +2,6 @@ use crate::types::{WallpaperInfo, WallpaperSource};
 use serde::Deserialize;
 
 const WALLHAVEN_API_URL: &str = "https://wallhaven.cc/api/v1/search";
-const DEFAULT_API_KEY: &str = "";
 
 #[derive(Debug, Deserialize)]
 struct WallhavenResponse {
@@ -13,8 +12,11 @@ struct WallhavenResponse {
 struct WallhavenImage {
     id: String,
     path: String,
+    #[allow(dead_code)]
     category: String,
+    #[allow(dead_code)]
     purity: String,
+    #[allow(dead_code)]
     thumbs: WallhavenThumbs,
     dimension_x: u32,
     dimension_y: u32,
@@ -22,6 +24,7 @@ struct WallhavenImage {
 
 #[derive(Debug, Deserialize)]
 struct WallhavenThumbs {
+    #[allow(dead_code)]
     original: String,
 }
 
