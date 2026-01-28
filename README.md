@@ -1,42 +1,73 @@
-# Wallpaper Mate
+# React + TypeScript + Vite
 
-一款基于 Tauri 构建的 macOS 壁纸管理器。自动获取、生成并设置精美的壁纸，提供接近原生的使用体验。
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 功能特性
+Currently, two official plugins are available:
 
-- 🖼️ **壁纸获取** - 从多个来源下载壁纸
-- 🎨 **壁纸生成** - AI 驱动的壁纸生成（即将推出）
-- ⏰ **自动更新** - 定时自动更换壁纸
-- 🎯 **菜单栏集成** - 原生 macOS 菜单栏应用体验
-- 💾 **本地收藏** - 保存和管理你喜欢的壁纸
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## 技术栈
+## React Compiler
 
-- **前端**: React/Vue/Svelte (待定)
-- **后端**: Rust + Tauri 2.0
-- **系统集成**: `wallpaper` crate 用于跨平台壁纸管理
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 安装
+## Expanding the ESLint configuration
 
-即将推出...
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## 开发
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-```bash
-# 安装依赖
-npm install
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-# 运行开发服务器
-npm run tauri dev
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-## 开发路线图
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-- [ ] 首个版本，包含壁纸获取功能
-- [ ] 带设置的菜单栏应用
-- [ ] AI 壁纸生成
-- [ ] Windows 支持（通过 Tauri 跨平台能力）
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## 许可证
-
-MIT
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
