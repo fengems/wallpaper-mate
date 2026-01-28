@@ -46,3 +46,18 @@
 - 使用 thiserror 创建自定义错误类型，便于错误处理
 - 使用 serde::{Serialize, Deserialize} 来处理 JSON 序列化
 - 创建空 stub 文件确保模块可以编译
+
+### Task 14-15 学习心得
+- UI 组件开发遇到 shadcn/ui 的类型系统问题
+- Select 组件的 onValueChange 接收 (value: string) 而不是 (value: T) => void
+- Button 组件支持 variant 和 size 属性，但 className 需要通过 cn 函数处理
+- macOS window.close() 可关闭 Tauri 窗口
+- TypeScript 类型定义使用 const export pattern 而非 enum
+- 文件名大小写在问题会导致编译错误（Settings.tsx vs settings.tsx）
+
+### Task 16-17 学习心得
+- App.tsx 实现了基础的事件监听和状态管理
+- 菜单栏事件通过 Tauri emit 触发
+- 条件渲染支持 preview 和 settings 视图
+- 简单的内联 UI 用于 MVP 验证
+
