@@ -27,3 +27,9 @@
 ### 壁纸来源
 - Bing Daily Wallpaper: 主要来源，零配置，中文化
 - Wallhaven: 动漫壁纸，可选 API key，混合密钥模式
+
+### Task 1 学习心得
+- TailwindCSS 4.x 需要使用 `@tailwindcss/postcss` 而不是直接使用 `tailwindcss` 插件
+- Tauri init 使用 `--ci` 参数可以跳过交互式提示
+- 需要手动创建目录结构，即使 Tauri init 创建了部分目录
+- 配置 identifier 为 `com.wallpapermate.app` 用于 macOS 应用识别
