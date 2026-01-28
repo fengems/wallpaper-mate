@@ -1,73 +1,116 @@
-# React + TypeScript + Vite
+# Wallpaper Mate
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款基于 Tauri 构建的 macOS 壁纸管理器。自动获取、生成并设置精美的壁纸，提供接近原生的使用体验。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🖼️ **壁纸获取** - 从 Bing Daily 和 Wallhaven 获取壁纸
+- 🎨 **壁纸设置** - 一键更换桌面壁纸
+- 📱 **菜单栏集成** - macOS 原生菜单栏应用
+- 💾 **本地缓存** - 壁纸下载后自动缓存
+- ⚙️ **设置管理** - 配置壁纸来源和 API Key
 
-## React Compiler
+## 技术栈
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **前端**: React + Vite + TypeScript + TailwindCSS
+- **后端**: Rust + Tauri 2.0
+- **状态管理**: Zustand
+- **壁纸管理**: wallpaper crate
+- **系统集成**: Tauri System Tray API
 
-## Expanding the ESLint configuration
+## 安装
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 安装依赖
+pnpm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# 启动开发服务器
+pnpm tauri dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 构建生产版本
+pnpm build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 项目结构
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+wallpaper-mate/
+├── src/                    # React 前端
+│   ├── components/       # UI 组件
+│   ├── hooks/            # 自定义 hooks
+│   ├── services/         # Tauri IPC 封装
+│   ├── store/            # Zustand 状态管理
+│   ├── types/            # TypeScript 类型定义
+│   └── App.tsx         # 应用主组件
+├── src-tauri/              # Rust 后端
+│   ├── src/
+│   │   ├── commands/   # Tauri 命令处理器
+│   │   ├── services/    # 业务逻辑服务
+│   │   ├── sources/     # 壁纸来源实现
+│   │   ├── types/       # 数据类型
+│   │   └── utils/       # 辅助函数
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+├── docs/                   # 文档
+├── package.json
+└── tsconfig.json
+```
+
+## 壁纸来源
+
+### Bing Daily Wallpaper
+- **特点**: 高质量、每日更新的壁纸
+- **优势**: 无需 API Key，中文内容丰富
+- **更新频率**: 每日更新
+- **API**: `https://www.bing.com/HPImageArchive.aspx`
+
+### Wallhaven
+- **特点**: 大量动漫和艺术壁纸，社区驱动
+- **优势**: 分类丰富，支持搜索
+- **限制**: 免费 API 有速率限制（45 req/min）
+- **API**: `https://wallhaven.cc/api/v1/search`
+- **配置**: 支持 categories（动漫 = 010）和 purity（SFW = 100）
+
+## 使用说明
+
+### 启动应用
+
+1. 运行 `pnpm tauri dev`
+2. 菜单栏图标会出现在 macOS 顶部状态栏
+3. 点击"下一张壁纸"获取并设置壁纸
+4. 点击设置可配置壁纸来源和 Wallhaven API Key
+
+### 设置选项
+
+- **壁纸来源**: 选择 Bing Daily 或 Wallhaven
+- **API Key**: 可选 Wallhaven API Key（如需更高速率限制）
+
+## 开发
+
+### 代码规范
+
+- 函数长度不超过 48 行
+- 局部变量不超过 5-10 个
+- 使用 prettier 格式化
+- 遵循 Rust 命名约定
+
+### Git 提交规范
+
+- `feat:` - 新增功能
+- `fix:` - 修复问题
+- `docs:` - 文档更新
+- `style:` - 代码格式调整
+- `refactor:` - 重构
+- `chore:` - 构建/工具链相关
+
+## 许可证
+
+MIT
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+---
+
+**最后更新**: 2026 年 1 月 28 日
