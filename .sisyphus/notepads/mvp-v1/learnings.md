@@ -39,3 +39,10 @@
 - 测试 setup 文件可以配置 globals 和测试环境
 - Rust 测试使用 `#[cfg(test)]` 模块和 `#[test]` 属性
 - 需要确保 Rust 工具链已安装才能运行 cargo test
+
+### Task 3 学习心得
+- Rust 模块使用 `pub mod` 声明并在 mod.rs 中导出
+- types 模块应该包含核心数据结构（WallpaperInfo, Source, Error）
+- 使用 thiserror 创建自定义错误类型，便于错误处理
+- 使用 serde::{Serialize, Deserialize} 来处理 JSON 序列化
+- 创建空 stub 文件确保模块可以编译
