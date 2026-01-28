@@ -19,6 +19,11 @@ pub fn run() {
       }
       Ok(())
     })
+    .invoke_handler(tauri::generate_handler![
+        commands::wallpaper::fetch_next_wallpaper,
+        commands::wallpaper::set_wallpaper_from_info,
+        commands::wallpaper::get_current_wallpaper_path,
+    ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -32,3 +37,4 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
+
