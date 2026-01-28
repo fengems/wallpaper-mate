@@ -8,10 +8,13 @@ import { useSettingsStore } from '@/store/settings';
 import { WallpaperSource } from '@/types';
 import { saveSettings } from '@/services/tauri';
 
-
 export default function Settings() {
   const { source, wallhavenApiKey, setSource, setWallhavenApiKey } = useSettingsStore();
   const [saved, setSaved] = useState(false);
+
+  const handleSourceChange = (newSource: string) => {
+    setSource(newSource as WallpaperSource);
+  };
 
   const handleSave = async () => {
     await saveSettings();
@@ -27,7 +30,7 @@ export default function Settings() {
         <div className="space-y-6">
           <div>
             <Label>壁纸来源</Label>
-            <Select value={source} onValueChange={(value) => setSource(value as WallpaperSource)}>
+            <Select value={source} onValueChange={handleSourceChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -63,4 +66,3 @@ export default function Settings() {
     </div>
   );
 }
-
