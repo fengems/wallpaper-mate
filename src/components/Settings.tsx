@@ -54,10 +54,10 @@ export default function Settings() {
           )}
 
           <div className="flex gap-4">
-            <Button variant="outline" className="flex-1" onClick={() => window.close()}>
+            <Button variant="outline" onClick={() => window.close()}>
               取消
             </Button>
-            <Button className="flex-1" onClick={handleSave}>
+            <Button onClick={handleSave}>
               {saved ? '已保存！' : '保存'}
             </Button>
           </div>
