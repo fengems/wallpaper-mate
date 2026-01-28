@@ -1,42 +1,42 @@
 # Wallpaper Mate
 
-A beautiful wallpaper manager for macOS built with Tauri. Automatically fetches, generates, and sets stunning wallpapers with a native-like experience.
+一款基于 Tauri 构建的 macOS 壁纸管理器。自动获取、生成并设置精美的壁纸，提供接近原生的使用体验。
 
-## Features
+## 功能特性
 
-- 🖼️ **Wallpaper Fetching** - Download wallpapers from various sources
-- 🎨 **Wallpaper Generation** - AI-powered wallpaper generation (coming soon)
-- ⏰ **Automatic Updates** - Schedule automatic wallpaper changes
-- 🎯 **Menu Bar Integration** - Native macOS menu bar app experience
-- 💾 **Local Collection** - Save and manage your favorite wallpapers
+- 🖼️ **壁纸获取** - 从多个来源下载壁纸
+- 🎨 **壁纸生成** - AI 驱动的壁纸生成（即将推出）
+- ⏰ **自动更新** - 定时自动更换壁纸
+- 🎯 **菜单栏集成** - 原生 macOS 菜单栏应用体验
+- 💾 **本地收藏** - 保存和管理你喜欢的壁纸
 
-## Tech Stack
+## 技术栈
 
-- **Frontend**: React/Vue/Svelte (TBD)
-- **Backend**: Rust + Tauri 2.0
-- **System Integration**: `wallpaper` crate for cross-platform wallpaper management
+- **前端**: React/Vue/Svelte (待定)
+- **后端**: Rust + Tauri 2.0
+- **系统集成**: `wallpaper` crate 用于跨平台壁纸管理
 
-## Installation
+## 安装
 
-Coming soon...
+即将推出...
 
-## Development
+## 开发
 
 ```bash
-# Install dependencies
+# 安装依赖
 npm install
 
-# Run development server
+# 运行开发服务器
 npm run tauri dev
 ```
 
-## Roadmap
+## 开发路线图
 
-- [ ] Initial release with wallpaper fetching
-- [ ] Menu bar app with settings
-- [ ] AI wallpaper generation
-- [ ] Windows support (via Tauri cross-platform)
+- [ ] 首个版本，包含壁纸获取功能
+- [ ] 带设置的菜单栏应用
+- [ ] AI 壁纸生成
+- [ ] Windows 支持（通过 Tauri 跨平台能力）
 
-## License
+## 许可证
 
 MIT

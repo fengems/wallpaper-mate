@@ -1,341 +1,341 @@
-# Wallpaper Mate - Product Requirements Document (PRD)
+# Wallpaper Mate - 产品需求文档 (PRD)
 
-## 1. Project Overview
+## 1. 项目概述
 
-**Project Name:** Wallpaper Mate
+**项目名称:** Wallpaper Mate
 
-**Description:** A beautiful wallpaper manager for macOS built with Tauri. Automatically fetches, generates, and sets stunning wallpapers with a native-like experience.
+**项目描述:** 一款基于 Tauri 构建的 macOS 壁纸管理器。自动获取、生成并设置精美的壁纸，提供接近原生的使用体验。
 
-**Target Platform:** macOS (primary), with future Windows support via Tauri cross-platform capabilities.
+**目标平台:** macOS（主要平台），未来通过 Tauri 跨平台能力支持 Windows。
 
-**Core Value:** Provide a lightweight, native-feeling wallpaper management application that automatically keeps the desktop fresh with beautiful images.
-
----
-
-## 2. Technical Solution
-
-### 2.1 Technology Stack Selection
-
-#### Decision Matrix: Swift vs Tauri
-
-| Factor | Swift (Native) | Tauri (Rust + Web) | Selection |
-|--------|----------------|-------------------|-----------|
-| **Native Experience** | ⭐⭐⭐⭐⭐ Best | ⭐⭐⭐⭐ Very Good | Swift wins |
-| **App Size** | ⭐⭐⭐⭐⭐ Smallest | ⭐⭐⭐⭐ Small (3-10MB) | Swift wins |
-| **Vibe Coding / AI-friendly** | ⭐⭐⭐ Moderate | ⭐⭐⭐⭐⭐ Excellent | **Tauri wins** |
-| **Cross-platform** | ❌ macOS only | ✅ macOS + Windows + Linux | **Tauri wins** |
-| **Development Speed** | ⭐⭐⭐ Moderate | ⭐⭐⭐⭐ Fast | Tauri wins |
-| **Ecosystem** | Apple-only | Massive Rust + Web ecosystem | Tauri wins |
-| **Wallpaper API Access** | Native NSWorkspace | `wallpaper` crate (mature) | Both easy |
-
-#### Final Decision: **Tauri**
-
-**Key Reasons:**
-1. **Vibe Coding** - Frontend frameworks (React/Vue/Svelte) are more familiar to AI models, easier maintenance
-2. **Cross-platform** - Future Windows compatibility without rewriting codebase
-3. **Small Footprint** - Significantly smaller than Electron (3-10MB vs 100MB+)
-4. **Wallpaper API** - The `wallpaper` crate provides simple cross-platform wallpaper management
-5. **Mature Ecosystem** - Rust backend + Modern web frontend
-
-### 2.2 Tech Stack Details
-
-**Backend (Rust):**
-- Tauri 2.0 (latest stable)
-- `wallpaper` crate (v3.2+) for system wallpaper management
-- `tokio` for async operations
-- `reqwest` for HTTP requests (wallpaper fetching)
-- `serde` for serialization
-
-**Frontend (Web):**
-- **Framework:** React (with Vite) - Recommended for AI code generation
-- **UI Library:** shadcn/ui or similar for modern, accessible components
-- **State Management:** Zustand or React Context API
-- **Styling:** TailwindCSS for rapid development
-
-**System Integration:**
-- **Menu Bar:** Tauri System Tray API (native macOS menu bar)
-- **Notifications:** macOS native notifications
-- **File System:** Persistent storage for wallpaper cache
+**核心价值:** 提供一款轻量级、原生体验的壁纸管理应用，自动保持桌面充满美丽的图片。
 
 ---
 
-## 3. Feature Requirements
+## 2. 技术方案
 
-### 3.1 Priority Matrix
+### 2.1 技术栈选择
 
-| Feature | Priority | Complexity | Target Release |
-|---------|----------|------------|----------------|
-| Wallpaper Fetching | **P0** | Medium | v1.0 |
-| Automatic Wallpaper Replacement | **P0** | Medium | v1.0 |
-| Menu Bar App | **P0** | Low | v1.0 |
-| AI Wallpaper Generation | **P1** | High | v2.0 |
-| Windows Support | **P2** | Medium | Future |
-| Advanced Scheduling | **P1** | Low | v1.5 |
+#### 决策矩阵：Swift vs Tauri
 
-### 3.2 Detailed Features
+| 因素 | Swift (原生) | Tauri (Rust + Web) | 选择 |
+|------|--------------|-------------------|------|
+| **原生体验** | ⭐⭐⭐⭐⭐ 最佳 | ⭐⭐⭐⭐ 非常好 | Swift 胜出 |
+| **应用体积** | ⭐⭐⭐⭐⭐ 最小 | ⭐⭐⭐⭐ 小 (3-10MB) | Swift 胜出 |
+| **Vibe Coding / AI 友好** | ⭐⭐⭐ 一般 | ⭐⭐⭐⭐⭐ 优秀 | **Tauri 胜出** |
+| **跨平台** | ❌ 仅 macOS | ✅ macOS + Windows + Linux | **Tauri 胜出** |
+| **开发速度** | ⭐⭐⭐ 一般 | ⭐⭐⭐⭐ 快 | Tauri 胜出 |
+| **生态系统** | 仅 Apple | 庞大的 Rust + Web 生态 | Tauri 胜出 |
+| **壁纸 API 访问** | 原生 NSWorkspace | `wallpaper` crate (成熟) | 两者都简单 |
 
-#### Phase 1: MVP (v1.0)
+#### 最终决策：**Tauri**
 
-**1. Wallpaper Fetching (P0)**
-- Support popular wallpaper sources:
-  - Unsplash API (free, high quality)
-  - Wallhaven (popular anime/art wallpapers)
-  - Bing Daily Wallpaper API
-  - Custom URL support
-- Download and cache wallpapers locally
-- Filter by resolution, category, tags
-- Preview wallpapers before setting
+**关键原因：**
+1. **Vibe Coding** - 前端框架（React/Vue/Svelte）对 AI 模型更熟悉，更容易维护
+2. **跨平台** - 未来 Windows 兼容性无需重写代码库
+3. **小体积** - 比 Electron 小得多（3-10MB vs 100MB+）
+4. **壁纸 API** - `wallpaper` crate 提供简单的跨平台壁纸管理
+5. **成熟生态** - Rust 后端 + 现代 Web 前端
 
-**2. Automatic Wallpaper Replacement (P0)**
-- Manual: One-click wallpaper change
-- Timer: Set intervals (e.g., every 30 min, 1 hour, daily)
-- Trigger: On startup, on wake from sleep
-- Support for multiple monitors
+### 2.2 技术栈详情
 
-**3. Menu Bar App (P0)**
-- System tray icon in macOS menu bar
-- Quick actions:
-  - Next wallpaper
-  - Pause/resume auto-change
-  - Open settings
-  - View current wallpaper info
-- Status indicator (e.g., auto-change active/paused)
+**后端 (Rust)：**
+- Tauri 2.0（最新稳定版）
+- `wallpaper` crate (v3.2+) 用于系统壁纸管理
+- `tokio` 用于异步操作
+- `reqwest` 用于 HTTP 请求（壁纸获取）
+- `serde` 用于序列化
 
-**4. Settings Management (P0)**
-- Wallpaper source selection
-- Change frequency configuration
-- Resolution preferences
-- Cache management
-- App launch on startup
+**前端 (Web)：**
+- **框架：** React（配合 Vite）- 推荐，适合 AI 代码生成
+- **UI 库：** shadcn/ui 或类似库，提供现代化、可访问的组件
+- **状态管理：** Zustand 或 React Context API
+- **样式：** TailwindCSS 用于快速开发
 
-**5. Wallpaper History (P1)**
-- Keep history of last N wallpapers
-- One-click revert to previous wallpaper
-- Mark wallpapers as favorites
-
-#### Phase 2: Enhanced Experience (v1.5)
-
-**6. Advanced Scheduling (P1)**
-- Set specific wallpapers for specific times (e.g., morning, evening)
-- Day/night automatic switching
-- Custom schedules (Monday = nature wallpapers, etc.)
-
-**7. Wallpaper Collections (P1)**
-- Create custom collections (e.g., "Nature", "Abstract", "Minimalist")
-- Batch download wallpapers to collections
-- Shuffle within collections
-
-#### Phase 3: AI Generation (v2.0)
-
-**8. AI Wallpaper Generation (P1)**
-- Integration with AI image APIs:
-  - Stable Diffusion API (Replicate, local SD)
-  - DALL-E API (OpenAI)
-  - Midjourney API (if available)
-- Prompt-based generation
-- Style presets (photorealistic, anime, abstract, etc.)
-- Negative prompt support
-- Aspect ratio control
-
-**9. Smart Curation (P2)**
-- Learn user preferences (based on favorites/skips)
-- AI-powered wallpaper recommendations
-- Mood-based suggestions (optional: integrate with calendar/weather)
-
-#### Phase 4: Cross-platform (Future)
-
-**10. Windows Support (P2)**
-- Tauri cross-platform support
-- Windows system tray
-- Windows-native notifications
-- Maintain feature parity
+**系统集成：**
+- **菜单栏：** Tauri System Tray API（原生 macOS 菜单栏）
+- **通知：** macOS 原生通知
+- **文件系统：** 壁纸缓存的持久化存储
 
 ---
 
-## 4. User Stories
+## 3. 功能需求
 
-### MVP Stories
+### 3.1 优先级矩阵
 
-**As a user, I want to:**
-1. Fetch wallpapers from popular sources, so I have a variety of beautiful images.
-2. Set a wallpaper as my desktop background with one click.
-3. Automatically change wallpapers on a schedule, so my desktop feels fresh.
-4. Access the app quickly from the menu bar, so I can change wallpapers without opening a full window.
-5. Configure wallpaper preferences (resolution, category, frequency), so the app matches my style.
-6. See a preview before setting a wallpaper, so I know what I'm getting.
+| 功能 | 优先级 | 复杂度 | 目标版本 |
+|------|--------|--------|----------|
+| 壁纸获取 | **P0** | 中等 | v1.0 |
+| 自动壁纸替换 | **P0** | 中等 | v1.0 |
+| 菜单栏应用 | **P0** | 低 | v1.0 |
+| AI 壁纸生成 | **P1** | 高 | v2.0 |
+| Windows 支持 | **P2** | 中等 | 未来 |
+| 高级调度 | **P1** | 低 | v1.5 |
 
-### Future Stories
+### 3.2 详细功能
 
-7. Generate custom wallpapers using AI, so I can have unique images.
-8. Create collections of my favorite wallpapers, so I can organize them by theme.
-9. Use the app on Windows, so I can have the same experience across devices.
+#### 第一阶段：MVP (v1.0)
+
+**1. 壁纸获取 (P0)**
+- 支持热门壁纸来源：
+  - Unsplash API（免费，高质量）
+  - Wallhaven（热门动漫/艺术壁纸）
+  - Bing 每日壁纸 API
+  - 自定义 URL 支持
+- 本地下载和缓存壁纸
+- 按分辨率、分类、标签过滤
+- 设置前预览壁纸
+
+**2. 自动壁纸替换 (P0)**
+- 手动：一键更换壁纸
+- 定时器：设置间隔（如每 30 分钟、1 小时、每天）
+- 触发：启动时、从睡眠唤醒时
+- 支持多显示器
+
+**3. 菜单栏应用 (P0)**
+- macOS 菜单栏中的系统托盘图标
+- 快速操作：
+  - 下一张壁纸
+  - 暂停/恢复自动更换
+  - 打开设置
+  - 查看当前壁纸信息
+- 状态指示器（如自动更换激活/暂停）
+
+**4. 设置管理 (P0)**
+- 壁纸来源选择
+- 更改频率配置
+- 分辨率偏好
+- 缓存管理
+- 应用启动时自动运行
+
+**5. 壁纸历史 (P1)**
+- 保留最近 N 张壁纸的历史记录
+- 一键恢复到上一张壁纸
+- 将壁纸标记为收藏
+
+#### 第二阶段：增强体验 (v1.5)
+
+**6. 高级调度 (P1)**
+- 为特定时间设置特定壁纸（如早晨、晚上）
+- 昼/夜自动切换
+- 自定义计划（周一 = 自然壁纸等）
+
+**7. 壁纸集合 (P1)**
+- 创建自定义集合（如"自然"、"抽象"、"极简主义"）
+- 批量下载壁纸到集合
+- 在集合内随机播放
+
+#### 第三阶段：AI 生成 (v2.0)
+
+**8. AI 壁纸生成 (P1)**
+- 集成 AI 图像 API：
+  - Stable Diffusion API（Replicate、本地 SD）
+  - DALL-E API（OpenAI）
+  - Midjourney API（如果可用）
+- 基于提示词生成
+- 风格预设（写实、动漫、抽象等）
+- 负面提示词支持
+- 宽高比控制
+
+**9. 智能策展 (P2)**
+- 学习用户偏好（基于收藏/跳过）
+- AI 驱动的壁纸推荐
+- 基于情绪的建议（可选：集成日历/天气）
+
+#### 第四阶段：跨平台（未来）
+
+**10. Windows 支持 (P2)**
+- Tauri 跨平台支持
+- Windows 系统托盘
+- Windows 原生通知
+- 保持功能对等
 
 ---
 
-## 5. Non-Functional Requirements
+## 4. 用户故事
 
-### Performance
-- App startup time < 2 seconds
-- Wallpaper fetch time < 5 seconds (for cached)
-- Wallpaper download time < 30 seconds (depending on image size)
-- Memory usage < 100MB (idle)
+### MVP 故事
 
-### Reliability
-- Graceful handling of network failures
-- Auto-retry for failed downloads
-- Persistent cache (survives app restart)
-- No data loss on app crash
+**作为用户，我希望：**
+1. 从热门来源获取壁纸，以便有各种美丽的图片。
+2. 一键将壁纸设置为我的桌面背景。
+3. 按计划自动更换壁纸，让桌面保持新鲜感。
+4. 从菜单栏快速访问应用，无需打开完整窗口即可更换壁纸。
+5. 配置壁纸偏好（分辨率、类别、频率），让应用符合我的风格。
+6. 设置壁纸前查看预览，知道会得到什么。
 
-### Usability
-- Native macOS feel and keyboard shortcuts
-- Intuitive UI with clear feedback
-- Accessible design (WCAG AA compliance)
-- Responsive on all screen sizes (if window app)
+### 未来故事
 
-### Security
-- Secure API key storage (Keychain integration)
-- No data sent to third parties without consent
-- Code signing for macOS distribution
-
-### Maintainability
-- Clean, modular code architecture
-- Comprehensive error handling
-- Well-documented APIs
-- AI-friendly code structure
+7. 使用 AI 生成自定义壁纸，拥有独特的图片。
+8. 创建我最喜欢的壁纸集合，按主题组织它们。
+9. 在 Windows 上使用应用，在设备间获得相同的体验。
 
 ---
 
-## 6. Technical Architecture
+## 5. 非功能性需求
 
-### 6.1 High-Level Architecture
+### 性能
+- 应用启动时间 < 2 秒
+- 壁纸获取时间 < 5 秒（已缓存）
+- 壁纸下载时间 < 30 秒（取决于图片大小）
+- 内存使用 < 100MB（空闲）
+
+### 可靠性
+- 优雅处理网络故障
+- 失败下载自动重试
+- 持久化缓存（应用重启后仍保留）
+- 应用崩溃不丢失数据
+
+### 可用性
+- 原生 macOS 感觉和键盘快捷键
+- 直观的 UI 和清晰的反馈
+- 可访问设计（符合 WCAG AA 标准）
+- 在所有屏幕尺寸上响应式（如果是窗口应用）
+
+### 安全性
+- 安全的 API 密钥存储（Keychain 集成）
+- 未经同意不向第三方发送数据
+- 用于 macOS 分发的代码签名
+
+### 可维护性
+- 干净、模块化的代码架构
+- 全面的错误处理
+- 文档齐全的 API
+- AI 友好的代码结构
+
+---
+
+## 6. 技术架构
+
+### 6.1 高层架构
 
 ```
 ┌─────────────────────────────────────────┐
-│         Frontend (React + Vite)        │
-│  - UI Components                        │
-│  - State Management                     │
-│  - Menu Bar Integration                │
+│         前端 (React + Vite)            │
+│  - UI 组件                            │
+│  - 状态管理                           │
+│  - 菜单栏集成                         │
 └──────────────┬──────────────────────────┘
                │ Tauri IPC
                ▼
 ┌─────────────────────────────────────────┐
-│      Backend (Rust + Tauri)            │
-│  - Wallpaper Commands                   │
-│  - API Handlers                        │
-│  - Scheduler Service                   │
-│  - Cache Management                    │
+│      后端 (Rust + Tauri)              │
+│  - 壁纸命令                           │
+│  - API 处理器                         │
+│  - 调度服务                           │
+│  - 缓存管理                           │
 └──────────────┬──────────────────────────┘
                │
-               ├─► wallpaper crate (System API)
-               ├─► reqwest (HTTP Client)
-               ├─► tokio (Async Runtime)
-               └─► File System (Cache)
+               ├─► wallpaper crate (系统 API)
+               ├─► reqwest (HTTP 客户端)
+               ├─► tokio (异步运行时)
+               └─► 文件系统 (缓存)
 ```
 
-### 6.2 Key Modules
+### 6.2 关键模块
 
-**Frontend Modules:**
-- `components/` - React UI components
-- `hooks/` - Custom React hooks (e.g., useWallpaper)
-- `services/` - API service layer (calls Tauri commands)
-- `store/` - State management
-- `types/` - TypeScript type definitions
+**前端模块：**
+- `components/` - React UI 组件
+- `hooks/` - 自定义 React hooks（如 useWallpaper）
+- `services/` - API 服务层（调用 Tauri 命令）
+- `store/` - 状态管理
+- `types/` - TypeScript 类型定义
 
-**Backend Modules:**
-- `commands/` - Tauri command handlers
-- `services/` - Business logic (fetcher, scheduler, cache)
-- `sources/` - Wallpaper source implementations (Unsplash, Wallhaven, etc.)
-- `utils/` - Helper functions
-
----
-
-## 7. Development Roadmap
-
-### Q1 2026: Foundation
-- [x] Project setup and architecture design
-- [ ] Tauri 2.0 project initialization
-- [ ] Basic menu bar app structure
-- [ ] Wallpaper API integration (`wallpaper` crate)
-- [ ] First wallpaper source (Unsplash)
-
-### Q2 2026: MVP
-- [ ] Complete wallpaper fetching features
-- [ ] Implement auto-change timer
-- [ ] Settings UI and persistence
-- [ ] Testing and bug fixes
-- [ ] v1.0 release
-
-### Q3 2026: Enhanced
-- [ ] Advanced scheduling
-- [ ] Wallpaper history and favorites
-- [ ] Additional wallpaper sources
-- [ ] Performance optimization
-- [ ] v1.5 release
-
-### Q4 2026: AI Integration
-- [ ] AI API integration (Stable Diffusion/DALL-E)
-- [ ] Prompt-based generation UI
-- [ ] Style presets
-- [ ] v2.0 release
-
-### 2027: Expansion
-- [ ] Windows support
-- [ ] Smart curation (ML-based)
-- [ ] Community features (sharing, collections)
+**后端模块：**
+- `commands/` - Tauri 命令处理器
+- `services/` - 业务逻辑（获取器、调度器、缓存）
+- `sources/` - 壁纸来源实现（Unsplash、Wallhaven 等）
+- `utils/` - 辅助函数
 
 ---
 
-## 8. Risks and Mitigations
+## 7. 开发路线图
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| API rate limits from wallpaper sources | High | Implement caching, multiple source support, respect rate limits |
-| `wallpaper` crate compatibility issues | Medium | Test thoroughly on target OS, contribute fixes upstream |
-| Tauri 2.0 breaking changes | Medium | Pin to stable version, monitor release notes |
-| AI API cost and reliability | High | Support multiple providers, implement fallbacks, allow local AI (SD) |
-| macOS app store approval | Medium | Follow Apple guidelines, code signing, privacy policy |
+### 2026 年 Q1：基础建设
+- [x] 项目设置和架构设计
+- [ ] Tauri 2.0 项目初始化
+- [ ] 基础菜单栏应用结构
+- [ ] 壁纸 API 集成（`wallpaper` crate）
+- [ ] 第一个壁纸来源（Unsplash）
 
----
+### 2026 年 Q2：MVP
+- [ ] 完成壁纸获取功能
+- [ ] 实现自动更换定时器
+- [ ] 设置 UI 和持久化
+- [ ] 测试和错误修复
+- [ ] v1.0 发布
 
-## 9. Success Metrics
+### 2026 年 Q3：增强
+- [ ] 高级调度
+- [ ] 壁纸历史和收藏
+- [ ] 额外的壁纸来源
+- [ ] 性能优化
+- [ ] v1.5 发布
 
-**Product Success:**
-- 1000+ downloads in first month
-- 4.5+ star rating on Mac App Store (if published)
-- 70%+ retention rate after 30 days
+### 2026 年 Q4：AI 集成
+- [ ] AI API 集成（Stable Diffusion/DALL-E）
+- [ ] 基于提示词生成的 UI
+- [ ] 风格预设
+- [ ] v2.0 发布
 
-**Technical Success:**
-- < 2% crash rate
-- < 5% API error rate
-- 50MB app size target
-
-**User Engagement:**
-- Average of 3+ wallpaper changes per week per user
-- 20%+ users use favorites feature
-- 10%+ users enable AI generation (after feature launch)
-
----
-
-## 10. Open Questions
-
-1. **Frontend Framework:** React vs Vue vs Svelte? (Recommend React for AI code generation)
-2. **UI Library:** shadcn/ui vs Chakra UI vs Mantine? (Recommend shadcn/ui for modern, accessible components)
-3. **AI Integration:** Which AI provider to prioritize? (Stable Diffusion for flexibility, DALL-E for ease)
-4. **Monetization:** Free vs Paid vs Freemium? (Recommend Freemium: free basic features, paid AI generation)
+### 2027 年：扩展
+- [ ] Windows 支持
+- [ ] 智能策展（基于 ML）
+- [ ] 社区功能（分享、集合）
 
 ---
 
-## 11. References
+## 8. 风险和缓解措施
 
-- [Tauri Documentation](https://tauri.app/)
+| 风险 | 影响 | 缓解措施 |
+|------|------|----------|
+| 壁纸来源的 API 速率限制 | 高 | 实现缓存、多来源支持、遵守速率限制 |
+| `wallpaper` crate 兼容性问题 | 中 | 在目标操作系统上充分测试、向上游贡献修复 |
+| Tauri 2.0 重大变更 | 中 | 固定到稳定版本、监控发布说明 |
+| AI API 成本和可靠性 | 高 | 支持多个提供商、实现回退、允许本地 AI（SD） |
+| macOS App Store 审批 | 中 | 遵循 Apple 指南、代码签名、隐私政策 |
+
+---
+
+## 9. 成功指标
+
+**产品成功：**
+- 首月下载量 1000+
+- Mac App Store 评分 4.5+（如果发布）
+- 30 天后留存率 70%+
+
+**技术成功：**
+- 崩溃率 < 2%
+- API 错误率 < 5%
+- 应用大小目标 50MB
+
+**用户参与度：**
+- 平均每位用户每周更换壁纸 3+ 次
+- 20%+ 用户使用收藏功能
+- 10%+ 用户启用 AI 生成（功能上线后）
+
+---
+
+## 10. 未决问题
+
+1. **前端框架：** React vs Vue vs Svelte？（推荐 React，适合 AI 代码生成）
+2. **UI 库：** shadcn/ui vs Chakra UI vs Mantine？（推荐 shadcn/ui，现代化、可访问的组件）
+3. **AI 集成：** 优先考虑哪个 AI 提供商？（Stable Diffusion 灵活性强，DALL-E 易用）
+4. **商业模式：** 免费vs 付费vs 免费增值？（推荐免费增值：基础功能免费，AI 生成付费）
+
+---
+
+## 11. 参考资料
+
+- [Tauri 文档](https://tauri.app/)
 - [`wallpaper` crate](https://docs.rs/wallpaper/)
 - [Unsplash API](https://unsplash.com/developers)
 - [Wallhaven API](https://wallhaven.cc/help/api)
-- [Bing Daily Wallpaper API](https://www.microsoft.com/en-us/bing/apis/bing-image-search-api)
+- [Bing 每日壁纸 API](https://www.microsoft.com/en-us/bing/apis/bing-image-search-api)
 - [shadcn/ui](https://ui.shadcn.com/)
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** January 28, 2026
-**Status:** Draft
+**文档版本:** 1.0
+**最后更新:** 2026 年 1 月 28 日
+**状态:** 草稿
