@@ -2,9 +2,6 @@ pub mod commands;
 pub mod services;
 pub mod sources;
 pub mod types;
-pub mod utils;
-
-use types::WallpaperError;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -20,27 +17,31 @@ pub fn run() {
 
       #[cfg(target_os = "macos")]
       {
-          use tauri::{menu::{Menu, MenuItem, Submenu}, tray::TrayIconBuilder};
+          use tauri::{menu::{Menu, MenuItem}, tray::TrayIconBuilder, Emitter};
+          use tauri::image::Image;
 
-          let fetch_menu = MenuItem::new("fetch_wallpaper", "下一张壁纸", true, None::<String>)
+          let fetch_menu = MenuItem::with_id(app, "fetch_wallpaper", "下一张壁纸", true, None::<String>)
               .expect("Failed to create menu item");
-          let open_settings = MenuItem::new("open_settings", "设置...", true, None::<String>)
+          let open_settings = MenuItem::with_id(app, "open_settings", "设置...", true, None::<String>)
               .expect("Failed to create menu item");
-          let quit_menu = MenuItem::new("quit", "退出", true, None::<String>)
+          let quit_menu = MenuItem::with_id(app, "quit", "退出", true, None::<String>)
               .expect("Failed to create menu item");
 
-          let tray_menu = Menu::with_items(app, &[&fetch_menu, &quit_menu])
+          let tray_menu = Menu::with_items(app, &[&fetch_menu, &open_settings, &quit_menu])
               .expect("Failed to create menu");
+
+          let icon_bytes = include_bytes!("../icons/16x16.png");
+          let icon = Image::new_owned(icon_bytes.to_vec(), 16, 16);
 
           let _tray = TrayIconBuilder::with_id("main-tray")
               .menu(&tray_menu)
-              .icon(tauri::Icon::Raw(include_bytes!("../icons/16x16.png")))
-              .on_menu_event(move |app, event| {
-                  if event.id == "fetch_wallpaper" {
+              .icon(icon)
+              .on_menu_event(|app: &tauri::AppHandle, event: tauri::menu::MenuEvent| {
+                  if event.id.as_ref() == "fetch_wallpaper" {
                       let _ = app.emit("fetch-wallpaper", ());
-                  } else if event.id == "open_settings" {
+                  } else if event.id.as_ref() == "open_settings" {
                       let _ = app.emit("open-settings", ());
-                  } else if event.id == "quit" {
+                  } else if event.id.as_ref() == "quit" {
                       std::process::exit(0);
                   }
               })

@@ -1,4 +1,5 @@
-# Logs
+# Sisyphus
+.sisyphus
 logs
 *.log
 npm-debug.log*

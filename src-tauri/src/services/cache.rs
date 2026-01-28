@@ -1,19 +1,15 @@
 use crate::types::{WallpaperError, WallpaperInfo, WallpaperSource};
 use std::{
     fs,
-    path::{Path, PathBuf},
+    path::PathBuf,
 };
-use tauri::{Config, Manager};
+use tauri::Manager;
 
-pub fn get_cache_dir(app: &impl Manager) -> Result<PathBuf, WallpaperError> {
-    let config = app.config().ok_or(WallpaperError::ApiError(
-        "Failed to get app config".to_string(),
-    ))?;
-    let cache_path = config
+pub fn get_cache_dir<R: tauri::Runtime>(app: &impl Manager<R>) -> Result<PathBuf, WallpaperError> {
+    let cache_path = app
+        .path()
         .app_data_dir()
-        .ok_or(WallpaperError::ApiError(
-            "Failed to get app data dir".to_string(),
-        ))?
+        .map_err(|e| WallpaperError::ApiError(e.to_string()))?
         .join("cache");
 
     if !cache_path.exists() {
@@ -23,8 +19,8 @@ pub fn get_cache_dir(app: &impl Manager) -> Result<PathBuf, WallpaperError> {
     Ok(cache_path)
 }
 
-pub async fn download_and_cache(
-    app: &impl Manager,
+pub async fn download_and_cache<R: tauri::Runtime>(
+    app: &impl Manager<R>,
     wallpaper: &WallpaperInfo,
 ) -> Result<PathBuf, WallpaperError> {
     let cache_dir = get_cache_dir(app)?;
@@ -51,7 +47,7 @@ pub async fn download_and_cache(
     Ok(file_path)
 }
 
-pub fn get_cached_path(app: &impl Manager, id: &str) -> Option<PathBuf> {
+pub fn get_cached_path<R: tauri::Runtime>(app: &impl Manager<R>, id: &str) -> Option<PathBuf> {
     let cache_dir = get_cache_dir(app).ok()?;
     let bing_path = cache_dir.join("bing").join(format!("{}.jpg", id));
     let wallhaven_path = cache_dir.join("wallhaven").join(format!("{}.jpg", id));
@@ -65,7 +61,7 @@ pub fn get_cached_path(app: &impl Manager, id: &str) -> Option<PathBuf> {
     }
 }
 
-pub fn clean_cache(app: &impl Manager) -> Result<(), WallpaperError> {
+pub fn clean_cache<R: tauri::Runtime>(app: &impl Manager<R>) -> Result<(), WallpaperError> {
     let cache_dir = get_cache_dir(app)?;
     fs::remove_dir_all(&cache_dir)?;
     Ok(())

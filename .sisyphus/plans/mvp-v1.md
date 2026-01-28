@@ -59,12 +59,18 @@
 - `docs/` 目录下的技术文档
 
 ### Definition of Done
-- [ ] `pnpm tauri dev` 启动应用无错误
-- [ ] 菜单栏图标显示，点击弹出菜单
-- [ ] "下一张壁纸" 按钮可用，点击后壁纸更换
-- [ ] 设置窗口可打开，可选择壁纸来源
-- [ ] Vitest 测试全部通过
-- [ ] Rust 测试全部通过
+
+- [x] `pnpm tauri dev` 启动应用无错误
+
+- [x] 菜单栏图标显示，点击弹出菜单
+
+- [x] "下一张壁纸" 按钮可用，点击后壁纸更换
+
+- [x] 设置窗口可打开，可选择壁纸来源
+
+- [x] Vitest 测试全部通过
+
+- [x] Rust 测试全部通过
 
 ### Must Have
 - macOS 菜单栏图标和菜单
@@ -178,7 +184,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ### Phase 1: Foundation (Wave 1)
 
-- [ ] 1. Tauri 2.0 项目初始化
+
+- [x] 1. Tauri 2.0 项目初始化
 
   **What to do**:
   - 使用 pnpm 创建 Vite + React + TypeScript 项目
@@ -228,10 +235,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] `pnpm install` 成功完成
-  - [ ] `pnpm tauri dev` 启动开发服务器，显示默认窗口
-  - [ ] 项目结构符合上述目录布局
-  - [ ] TailwindCSS 可用（测试 class 生效）
+  
+- [x] `pnpm install` 成功完成
+  
+- [x] `pnpm tauri dev` 启动开发服务器，显示默认窗口
+  
+- [x] 项目结构符合上述目录布局
+  
+- [x] TailwindCSS 可用（测试 class 生效）
 
   **Commit**: YES
   - Message: `feat: 初始化 Tauri 2.0 + React + Vite 项目`
@@ -239,7 +250,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 2. 测试基础设施设置
+
+- [x] 2. 测试基础设施设置
 
   **What to do**:
   - 安装 Vitest 和相关测试依赖
@@ -270,10 +282,14 @@ Parallel Speedup: ~50% faster than sequential
   - Rust testing: https://doc.rust-lang.org/book/ch11-01-writing-tests.html
 
   **Acceptance Criteria**:
-  - [ ] `pnpm test` 运行成功
-  - [ ] 示例测试文件 `src/__tests__/example.test.ts` 通过
-  - [ ] `cargo test` 在 `src-tauri/` 中运行成功
-  - [ ] 示例 Rust 测试 `src-tauri/src/lib.rs` 中的 `#[cfg(test)]` 通过
+  
+- [x] `pnpm test` 运行成功
+  
+- [x] 示例测试文件 `src/__tests__/example.test.ts` 通过
+  
+- [x] `cargo test` 在 `src-tauri/` 中运行成功
+  
+- [x] 示例 Rust 测试 `src-tauri/src/lib.rs` 中的 `#[cfg(test)]` 通过
 
   **Commit**: YES
   - Message: `chore: 设置 Vitest 和 Rust 测试基础设施`
@@ -283,7 +299,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ### Phase 2: Backend Core (Wave 2)
 
-- [ ] 3. Rust 模块结构搭建
+
+- [x] 3. Rust 模块结构搭建
 
   **What to do**:
   - 在 `src-tauri/src/` 下创建模块目录结构
@@ -344,10 +361,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] `cargo build` 成功编译
-  - [ ] 所有模块正确导出（`pub mod` 声明）
-  - [ ] 类型定义可被其他模块使用
-  - [ ] `cargo test` 通过（空测试）
+  
+- [x] `cargo build` 成功编译
+  
+- [x] 所有模块正确导出（`pub mod` 声明）
+  
+- [x] 类型定义可被其他模块使用
+  
+- [x] `cargo test` 通过（空测试）
 
   **Commit**: YES
   - Message: `feat: 搭建 Rust 后端模块结构`
@@ -355,7 +376,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 4. wallpaper crate 集成
+
+- [x] 4. wallpaper crate 集成
 
   **What to do**:
   - 在 `services/wallpaper.rs` 中封装 wallpaper crate
@@ -390,10 +412,14 @@ Parallel Speedup: ~50% faster than sequential
   3. **REFACTOR**: 提取错误类型到 `types/error.rs`
 
   **Acceptance Criteria**:
-  - [ ] 测试文件存在: `src-tauri/src/services/wallpaper.rs` 包含 `#[cfg(test)]` 模块
-  - [ ] 测试通过: `cargo test services::wallpaper`
-  - [ ] 函数签名: `pub fn set_wallpaper(path: &Path) -> Result<(), WallpaperError>`
-  - [ ] 手动验证: 调用函数后桌面壁纸更改
+  
+- [x] 测试文件存在: `src-tauri/src/services/wallpaper.rs` 包含 `#[cfg(test)]` 模块
+  
+- [x] 测试通过: `cargo test services::wallpaper`
+  
+- [x] 函数签名: `pub fn set_wallpaper(path: &Path) -> Result<(), WallpaperError>`
+  
+- [x] 手动验证: 调用函数后桌面壁纸更改
 
   **Commit**: YES
   - Message: `feat: 集成 wallpaper crate，实现壁纸设置功能`
@@ -401,7 +427,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 5. Bing Daily API 服务
+
+- [x] 5. Bing Daily API 服务
 
   **What to do**:
   - 在 `sources/bing.rs` 中实现 Bing Daily Wallpaper API 客户端
@@ -444,10 +471,14 @@ Parallel Speedup: ~50% faster than sequential
   3. **REFACTOR**: 提取 URL 构建到独立函数
 
   **Acceptance Criteria**:
-  - [ ] 测试文件: `src-tauri/src/sources/bing.rs` 包含测试模块
-  - [ ] 单元测试通过: `cargo test sources::bing`
-  - [ ] 返回类型: `Vec<WallpaperInfo>`
-  - [ ] 手动验证: 调用 API 返回有效的壁纸信息
+  
+- [x] 测试文件: `src-tauri/src/sources/bing.rs` 包含测试模块
+  
+- [x] 单元测试通过: `cargo test sources::bing`
+  
+- [x] 返回类型: `Vec<WallpaperInfo>`
+  
+- [x] 手动验证: 调用 API 返回有效的壁纸信息
 
   **Commit**: YES
   - Message: `feat: 实现 Bing Daily Wallpaper API 服务`
@@ -455,7 +486,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 6. Wallhaven API 服务
+
+- [x] 6. Wallhaven API 服务
 
   **What to do**:
   - 在 `sources/wallhaven.rs` 中实现 Wallhaven API 客户端
@@ -490,10 +522,14 @@ Parallel Speedup: ~50% faster than sequential
   3. **REFACTOR**: 使用 builder pattern 构建查询参数
 
   **Acceptance Criteria**:
-  - [ ] 测试通过: `cargo test sources::wallhaven`
-  - [ ] 支持 categories 筛选（anime = 010）
-  - [ ] 支持可选 API key
-  - [ ] 返回类型: `Vec<WallpaperInfo>`
+  
+- [x] 测试通过: `cargo test sources::wallhaven`
+  
+- [x] 支持 categories 筛选（anime = 010）
+  
+- [x] 支持可选 API key
+  
+- [x] 返回类型: `Vec<WallpaperInfo>`
 
   **Commit**: YES
   - Message: `feat: 实现 Wallhaven API 服务`
@@ -503,7 +539,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ### Phase 3: Backend Features (Wave 3)
 
-- [ ] 7. 缓存管理服务
+
+- [x] 7. 缓存管理服务
 
   **What to do**:
   - 在 `services/cache.rs` 中实现缓存管理
@@ -544,10 +581,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 测试通过: `cargo test services::cache`
-  - [ ] 壁纸下载后保存到正确目录
-  - [ ] 缓存路径可检索
-  - [ ] 缓存清理功能可用
+  
+- [x] 测试通过: `cargo test services::cache`
+  
+- [x] 壁纸下载后保存到正确目录
+  
+- [x] 缓存路径可检索
+  
+- [x] 缓存清理功能可用
 
   **Commit**: YES
   - Message: `feat: 实现壁纸缓存管理服务`
@@ -555,7 +596,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 8. Tauri Commands 层
+
+- [x] 8. Tauri Commands 层
 
   **What to do**:
   - 在 `commands/wallpaper.rs` 中定义 Tauri 命令
@@ -602,10 +644,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 所有命令在 `tauri::generate_handler![]` 中注册
-  - [ ] 前端可通过 `invoke()` 调用命令
-  - [ ] 错误正确返回到前端
-  - [ ] `cargo test commands` 通过
+  
+- [x] 所有命令在 `tauri::generate_handler![]` 中注册
+  
+- [x] 前端可通过 `invoke()` 调用命令
+  
+- [x] 错误正确返回到前端
+  
+- [x] `cargo test commands` 通过
 
   **Commit**: YES
   - Message: `feat: 实现 Tauri IPC 命令层`
@@ -613,7 +659,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 9. System Tray 菜单栏
+
+- [x] 9. System Tray 菜单栏
 
   **What to do**:
   - 在 Tauri setup hook 中创建 System Tray
@@ -652,15 +699,22 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 菜单栏图标显示
-  - [ ] 点击"下一张壁纸"触发壁纸更换
-  - [ ] 点击"设置..."打开设置窗口
-  - [ ] 点击"退出"关闭应用
+  
+- [x] 菜单栏图标显示
+  
+- [x] 点击"下一张壁纸"触发壁纸更换
+  
+- [x] 点击"设置..."打开设置窗口
+  
+- [x] 点击"退出"关闭应用
 
   **Manual Verification**:
-  - [ ] `pnpm tauri dev` 启动后菜单栏显示图标
-  - [ ] 右键/左键点击显示菜单
-  - [ ] 各菜单项功能正常
+  
+- [x] `pnpm tauri dev` 启动后菜单栏显示图标
+  
+- [x] 右键/左键点击显示菜单
+  
+- [x] 各菜单项功能正常
 
   **Commit**: YES
   - Message: `feat: 实现 macOS 菜单栏 System Tray`
@@ -670,7 +724,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ### Phase 4: Frontend (Wave 4)
 
-- [ ] 10. React 前端结构搭建
+
+- [x] 10. React 前端结构搭建
 
   **What to do**:
   - 创建前端目录结构（components, hooks, services, store, types）
@@ -716,10 +771,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 目录结构创建完成
-  - [ ] 路径别名 `@/` 可用
-  - [ ] `pnpm dev` 启动无错误
-  - [ ] TypeScript 编译通过
+  
+- [x] 目录结构创建完成
+  
+- [x] 路径别名 `@/` 可用
+  
+- [x] `pnpm dev` 启动无错误
+  
+- [x] TypeScript 编译通过
 
   **Commit**: YES
   - Message: `feat: 搭建 React 前端结构`
@@ -727,7 +786,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 11. Zustand 状态管理
+
+- [x] 11. Zustand 状态管理
 
   **What to do**:
   - 安装 Zustand
@@ -776,10 +836,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] `pnpm add zustand` 完成
-  - [ ] Store 文件创建并导出
-  - [ ] 测试通过: `pnpm test store`
-  - [ ] DevTools 集成可用（开发模式）
+  
+- [x] `pnpm add zustand` 完成
+  
+- [x] Store 文件创建并导出
+  
+- [x] 测试通过: `pnpm test store`
+  
+- [x] DevTools 集成可用（开发模式）
 
   **Commit**: YES
   - Message: `feat: 实现 Zustand 状态管理`
@@ -787,7 +851,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 12. shadcn/ui 组件库集成
+
+- [x] 12. shadcn/ui 组件库集成
 
   **What to do**:
   - 初始化 shadcn/ui（`pnpm dlx shadcn-ui@latest init`）
@@ -816,10 +881,14 @@ Parallel Speedup: ~50% faster than sequential
   - Components to add: Button, Card, Input, Select, Label, Separator, Sonner (toast)
 
   **Acceptance Criteria**:
-  - [ ] `components.json` 配置完成
-  - [ ] 必要组件添加: `pnpm dlx shadcn-ui@latest add button card input select`
-  - [ ] 组件可在页面中使用
-  - [ ] Toast 通知可触发
+  
+- [x] `components.json` 配置完成
+  
+- [x] 必要组件添加: `pnpm dlx shadcn-ui@latest add button card input select`
+  
+- [x] 组件可在页面中使用
+  
+- [x] Toast 通知可触发
 
   **Commit**: YES
   - Message: `feat: 集成 shadcn/ui 组件库`
@@ -827,7 +896,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 13. Tauri IPC 服务层
+
+- [x] 13. Tauri IPC 服务层
 
   **What to do**:
   - 在 `services/tauri.ts` 中封装 Tauri invoke 调用
@@ -871,10 +941,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 所有后端命令有对应前端函数
-  - [ ] 类型定义与后端一致
-  - [ ] 测试通过（mock invoke）
-  - [ ] 错误处理完整
+  
+- [x] 所有后端命令有对应前端函数
+  
+- [x] 类型定义与后端一致
+  
+- [x] 测试通过（mock invoke）
+  
+- [x] 错误处理完整
 
   **Commit**: YES
   - Message: `feat: 实现 Tauri IPC 服务层`
@@ -884,7 +958,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ### Phase 5: Integration (Wave 5)
 
-- [ ] 14. 设置界面 UI
+
+- [x] 14. 设置界面 UI
 
   **What to do**:
   - 创建 Settings 页面/组件
@@ -928,11 +1003,16 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 设置界面可从菜单栏打开
-  - [ ] 来源选择可切换
-  - [ ] API Key 可输入并保存
-  - [ ] 保存后设置持久化
-  - [ ] 组件测试通过
+  
+- [x] 设置界面可从菜单栏打开
+  
+- [x] 来源选择可切换
+  
+- [x] API Key 可输入并保存
+  
+- [x] 保存后设置持久化
+  
+- [x] 组件测试通过
 
   **Commit**: YES
   - Message: `feat: 实现设置界面 UI`
@@ -940,7 +1020,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 15. 壁纸预览组件
+
+- [x] 15. 壁纸预览组件
 
   **What to do**:
   - 创建 WallpaperPreview 组件
@@ -978,10 +1059,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 组件正确显示壁纸图片
-  - [ ] 加载状态显示 skeleton/spinner
-  - [ ] "设为壁纸"按钮可点击
-  - [ ] 组件测试通过
+  
+- [x] 组件正确显示壁纸图片
+  
+- [x] 加载状态显示 skeleton/spinner
+  
+- [x] "设为壁纸"按钮可点击
+  
+- [x] 组件测试通过
 
   **Commit**: YES
   - Message: `feat: 实现壁纸预览组件`
@@ -989,7 +1074,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 16. 端到端集成测试
+
+- [x] 16. 端到端集成测试
 
   **What to do**:
   - 验证完整用户流程
@@ -1026,10 +1112,14 @@ Parallel Speedup: ~50% faster than sequential
   ```
 
   **Acceptance Criteria**:
-  - [ ] 所有手动测试用例通过
-  - [ ] 无控制台错误
-  - [ ] 无 Rust panic
-  - [ ] 性能可接受（壁纸获取 < 5s）
+  
+- [x] 所有手动测试用例通过
+  
+- [x] 无控制台错误
+  
+- [x] 无 Rust panic
+  
+- [x] 性能可接受（壁纸获取 < 5s）
 
   **Commit**: YES
   - Message: `fix: 修复集成测试发现的问题`
@@ -1039,7 +1129,8 @@ Parallel Speedup: ~50% faster than sequential
 
 ### Phase 6: Polish (Wave 6)
 
-- [ ] 17. 文档和清理
+
+- [x] 17. 文档和清理
 
   **What to do**:
   - 更新 README.md 添加使用说明
@@ -1069,10 +1160,14 @@ Parallel Speedup: ~50% faster than sequential
   - `docs/api.md` - Tauri 命令 API
 
   **Acceptance Criteria**:
-  - [ ] README.md 更新，包含安装和使用说明
-  - [ ] docs/ 下有技术文档
-  - [ ] 无未使用的依赖（`pnpm prune`）
-  - [ ] 关键函数有注释
+  
+- [x] README.md 更新，包含安装和使用说明
+  
+- [x] docs/ 下有技术文档
+  
+- [x] 无未使用的依赖（`pnpm prune`）
+  
+- [x] 关键函数有注释
 
   **Commit**: YES
   - Message: `docs: 添加技术文档和使用说明`
@@ -1115,12 +1210,21 @@ pnpm tauri dev      # Expected: 应用启动，菜单栏图标显示
 ```
 
 ### Final Checklist
-- [ ] 菜单栏图标显示正常
-- [ ] "下一张壁纸"功能可用
-- [ ] Bing Daily 壁纸获取成功
-- [ ] Wallhaven 壁纸获取成功
-- [ ] 设置界面可打开
-- [ ] 设置保存后持久化
-- [ ] 所有测试通过
-- [ ] 文档完整
-- [ ] 代码符合 AGENTS.md 规范
+
+- [x] 菜单栏图标显示正常
+
+- [x] "下一张壁纸"功能可用
+
+- [x] Bing Daily 壁纸获取成功
+
+- [x] Wallhaven 壁纸获取成功
+
+- [x] 设置界面可打开
+
+- [x] 设置保存后持久化
+
+- [x] 所有测试通过
+
+- [x] 文档完整
+
+- [x] 代码符合 AGENTS.md 规范

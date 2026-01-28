@@ -1,11 +1,12 @@
 use crate::types::WallpaperError;
+use std::path::Path;
 
-pub fn set_wallpaper(path: &std::path::Path) -> Result<(), WallpaperError> {
-    wallpaper::set_from_path(path)
+pub fn set_wallpaper(path: &Path) -> Result<(), WallpaperError> {
+    wallpaper::set_from_path(path.to_str().unwrap())
         .map_err(|e| WallpaperError::WallpaperError(e.to_string()))
 }
 
-pub fn get_current_wallpaper() -> Result<std::path::PathBuf, WallpaperError> {
+pub fn get_current_wallpaper() -> Result<String, WallpaperError> {
     wallpaper::get()
         .map_err(|e| WallpaperError::WallpaperError(e.to_string()))
 }
