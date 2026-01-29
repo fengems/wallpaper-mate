@@ -1,4 +1,6 @@
-import { ImageIcon, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { ImageIcon } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 interface Source {
   id: string;
@@ -21,6 +23,18 @@ export default function PageHeader({
   currentSource,
   onSourceChange,
 }: PageHeaderProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedSource = sources.find((s) => s.id === currentSource);
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleSelect = (sourceId: string) => {
+    onSourceChange(sourceId);
+    setIsOpen(false);
+  };
+
   return (
     <header className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-black/20 backdrop-blur-xl z-20">
       <div className="flex items-center gap-4">
@@ -41,18 +55,75 @@ export default function PageHeader({
       </div>
 
       <div className="relative group">
-        <select
-          value={currentSource}
-          onChange={(e) => onSourceChange(e.target.value)}
-          className="appearance-none bg-zinc-800/90 border border-white/10 text-zinc-200 text-xs font-medium rounded-lg pl-4 pr-8 py-2 cursor-pointer hover:bg-zinc-700/90 hover:border-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+        <button
+          onClick={handleToggle}
+          className={cn(
+            'relative flex items-center gap-2.5 bg-zinc-800/90 border border-white/10 text-zinc-200 text-xs font-medium rounded-lg pl-4 pr-3 py-2.5 cursor-pointer transition-all',
+            isOpen
+              ? 'bg-zinc-700/90 border-white/20 text-white'
+              : 'hover:bg-zinc-700/90 hover:border-white/15'
+          )}
         >
-          {sources.map((source) => (
-            <option key={source.id} value={source.id}>
-              {source.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none group-hover:text-zinc-300 transition-colors" />
+          <span className="flex items-center gap-2.5">
+            {selectedSource?.label || sources[0]?.label}
+          </span>
+          <div
+            className={cn(
+              'w-4 h-4 transition-transform duration-200',
+              isOpen ? 'rotate-180' : ''
+            )}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 9l6 6 6-6"
+              />
+            </svg>
+          </div>
+        </button>
+
+        {isOpen && (
+          <div className="absolute right-0 top-full mt-1.5 w-40 bg-zinc-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50">
+            <div className="p-1">
+              {sources.map((source) => (
+                <button
+                  key={source.id}
+                  onClick={() => handleSelect(source.id)}
+                  className={cn(
+                    'w-full flex items-center justify-between px-4 py-3 text-xs rounded-lg transition-colors',
+                    source.id === currentSource
+                      ? 'bg-gradient-to-r text-white from-indigo-500 to-purple-500 font-medium'
+                      : 'text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-200'
+                  )}
+                >
+                  <span>{source.label}</span>
+                  {source.id === currentSource && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
