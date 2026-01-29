@@ -7,6 +7,7 @@ import type {
   WallpaperInfo,
 } from '../types';
 import PreviewModal from '../components/PreviewModal';
+import PageHeader from '../components/PageHeader';
 import {
   ChevronLeft,
   ChevronRight,
@@ -16,21 +17,22 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
+// 统一平台顺序：Bing 在前，Wallhaven 在后
 const SOURCES = [
-  {
-    id: 'wallhaven' as const,
-    label: 'Wallhaven',
-    color: 'from-orange-500 to-red-600',
-  },
   {
     id: 'bing' as const,
     label: 'Bing Daily',
     color: 'from-blue-500 to-cyan-500',
   },
+  {
+    id: 'wallhaven' as const,
+    label: 'Wallhaven',
+    color: 'from-orange-500 to-red-600',
+  },
 ];
 
 export default function WallpaperList() {
-  const [source, setSource] = useState<WallpaperSource>('wallhaven');
+  const [source, setSource] = useState<WallpaperSource>('bing');
   const [wallpapers, setWallpapers] = useState<WallpaperListItem[]>([]);
   const [page, setPage] = useState<number>(1);
   const [pagination, setPagination] = useState<Omit<
@@ -71,8 +73,8 @@ export default function WallpaperList() {
     fetchWallpapers();
   }, [fetchWallpapers]);
 
-  const handleSourceChange = (newSource: WallpaperSource) => {
-    setSource(newSource);
+  const handleSourceChange = (newSource: string) => {
+    setSource(newSource as WallpaperSource);
     setPage(1);
   };
 
@@ -147,49 +149,13 @@ export default function WallpaperList() {
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
-      <header className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-black/20 backdrop-blur-xl z-20">
-        <div className="flex items-center gap-4">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center border border-white/10">
-              <ImageIcon className="w-5 h-5 text-indigo-400" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-sm font-semibold text-zinc-100 tracking-tight">
-              壁纸探索
-            </h1>
-            <p className="text-[10px] text-zinc-500 font-mono tracking-wider">
-              Explorer
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {SOURCES.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => handleSourceChange(s.id)}
-              className={cn(
-                'relative px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-300',
-                source === s.id
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              )}
-            >
-              {source === s.id && (
-                <span
-                  className={cn(
-                    'absolute inset-0 bg-gradient-to-r rounded-lg opacity-90',
-                    s.color
-                  )}
-                />
-              )}
-              <span className="relative">{s.label}</span>
-            </button>
-          ))}
-        </div>
-      </header>
+      <PageHeader
+        title="壁纸探索"
+        subtitle="Explorer"
+        sources={SOURCES}
+        currentSource={source}
+        onSourceChange={handleSourceChange}
+      />
 
       <main className="flex-1 overflow-y-auto p-6 relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(99,102,241,0.08),transparent_50%)]" />
@@ -198,7 +164,9 @@ export default function WallpaperList() {
           <div className="relative z-10 flex justify-center items-center h-full">
             <div className="flex flex-col items-center gap-4">
               <div className="w-12 h-12 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-              <p className="text-xs text-zinc-500 font-medium">加载中...</p>
+              <p className="text-xs font-medium tracking-widest uppercase text-zinc-500">
+                加载中...
+              </p>
             </div>
           </div>
         ) : wallpapers.length === 0 ? (
