@@ -55,6 +55,7 @@ pub fn run() {
         commands::wallpaper::fetch_next_wallpaper,
         commands::wallpaper::set_wallpaper_from_info,
         commands::wallpaper::get_current_wallpaper_path,
+        commands::wallpaper::fetch_wallpapers_list,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

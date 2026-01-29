@@ -11,6 +11,24 @@ pub struct WallpaperInfo {
     pub cached: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WallpaperListItem {
+    pub id: String,
+    pub title: String,
+    pub url: String,
+    pub source: WallpaperSource,
+    pub thumb_url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PaginatedResponse<T> {
+    pub data: Vec<T>,
+    pub current_page: u32,
+    pub last_page: u32,
+    pub per_page: u32,
+    pub total: u32,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum WallpaperSource {
     Bing,

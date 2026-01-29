@@ -6,6 +6,7 @@ const WALLHAVEN_API_URL: &str = "https://wallhaven.cc/api/v1/search";
 #[derive(Debug, Deserialize)]
 struct WallhavenResponse {
     data: Vec<WallhavenImage>,
+    meta: Option<WallhavenMeta>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -26,6 +27,16 @@ struct WallhavenImage {
 struct WallhavenThumbs {
     #[allow(dead_code)]
     original: String,
+    #[allow(dead_code)]
+    large: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct WallhavenMeta {
+    current_page: u32,
+    last_page: u32,
+    per_page: u32,
+    total: u32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -132,6 +143,74 @@ pub async fn search_wallpapers(config: Option<WallhavenConfig>) -> Result<Vec<Wa
         .collect();
 
     Ok(wallpapers)
+}
+
+pub async fn search_wallpapers_paginated(
+    config: Option<WallhavenConfig>,
+    page: u32,
+) -> Result<crate::types::PaginatedResponse<crate::types::WallpaperListItem>, Box<dyn std::error::Error + Send + Sync>> {
+    use crate::types::{PaginatedResponse, WallpaperListItem, WallpaperSource};
+
+    let config = config.unwrap_or_default();
+    let mut url = reqwest::Url::parse(WALLHAVEN_API_URL)?;
+    url.query_pairs_mut()
+        .append_pair("categories", &config.categories)
+        .append_pair("purity", &config.purity)
+        .append_pair("sorting", &config.sorting)
+        .append_pair("page", &page.to_string());
+
+    if let Some(key) = &config.api_key {
+        if !key.is_empty() {
+            url.query_pairs_mut().append_pair("apikey", key);
+        }
+    }
+
+    let client = if let Some(key) = &config.api_key {
+        if !key.is_empty() {
+            reqwest::Client::builder()
+                .default_headers(create_auth_header(key))
+                .build()?
+        } else {
+            reqwest::Client::new()
+        }
+    } else {
+        reqwest::Client::new()
+    };
+
+    let response = client.get(url).send().await
+        .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+    let wallhaven_response: WallhavenResponse = response.json().await
+        .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+
+    let meta = wallhaven_response.meta.unwrap_or_else(|| WallhavenMeta {
+        current_page: page,
+        last_page: 1,
+        per_page: 24,
+        total: wallhaven_response.data.len() as u32,
+    });
+
+    let wallpapers = wallhaven_response
+        .data
+        .into_iter()
+        .filter(|img| img.dimension_x > img.dimension_y)
+        .map(|img| {
+            WallpaperListItem {
+                id: img.id.clone(),
+                title: format!("Wallhaven #{} ({}x{})", img.id, img.dimension_x, img.dimension_y),
+                url: img.path.clone(),
+                source: WallpaperSource::Wallhaven,
+                thumb_url: img.thumbs.large.clone(),
+            }
+        })
+        .collect();
+
+    Ok(PaginatedResponse {
+        data: wallpapers,
+        current_page: meta.current_page,
+        last_page: meta.last_page,
+        per_page: meta.per_page,
+        total: meta.total,
+    })
 }
 
 fn create_auth_header(api_key: &str) -> reqwest::header::HeaderMap {

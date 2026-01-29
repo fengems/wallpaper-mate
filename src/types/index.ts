@@ -14,6 +14,22 @@ export interface WallpaperInfo {
   cached: boolean;
 }
 
+export interface WallpaperListItem {
+  id: string;
+  title: string;
+  url: string;
+  thumbUrl: string;
+  source: WallpaperSource;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
+  total: number;
+}
+
 export interface Settings {
   source: WallpaperSource;
   wallhavenApiKey?: string;
@@ -24,4 +40,3 @@ export type WallpaperEvent =
   | { event: 'wallpaper-set'; payload: string }
   | { event: 'fetch-wallpaper'; payload: void }
   | { event: 'open-settings'; payload: void };
-

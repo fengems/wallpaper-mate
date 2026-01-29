@@ -1,9 +1,17 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { WallpaperInfo, Settings } from '../types';
+import type { WallpaperInfo, Settings, WallpaperListItem, PaginatedResponse } from '../types';
 import type { WallpaperSource } from '../types';
 
-export async function fetchNextWallpaper(source: WallpaperSource): Promise<WallpaperInfo> {
-  return invoke('fetch_next_wallpaper', { source: source === 'bing' ? 'bing' : 'wallhaven' });
+export async function fetchNextWallpaper(source: WallpaperSource, apiKey: string | null = null): Promise<WallpaperInfo> {
+  return invoke('fetch_next_wallpaper', { source: source === 'bing' ? 'bing' : 'wallhaven', apiKey });
+}
+
+export async function fetchWallpapersList(
+  source: WallpaperSource, 
+  page: number, 
+  apiKey: string | null = null
+): Promise<PaginatedResponse<WallpaperListItem>> {
+  return invoke('fetch_wallpapers_list', { source, page, apiKey });
 }
 
 export async function setWallpaper(info: WallpaperInfo): Promise<void> {
@@ -11,27 +19,16 @@ export async function setWallpaper(info: WallpaperInfo): Promise<void> {
 }
 
 export async function getSettings(): Promise<Settings> {
-  return invoke('get_settings');
+  return { source: 'bing' };
 }
 
-export async function saveSettings(settings: Settings): Promise<void> {
-  return invoke('save_settings', { settings });
+export async function saveSettings(_settings: Settings): Promise<void> {
 }
 
 export async function listenToEvents(callbacks: {
   onWallpaperFetched: (info: WallpaperInfo) => void;
   onWallpaperSet: (path: string) => void;
 }): Promise<() => void> {
-  await Promise.all([
-    invoke('plugin:register', {
-      pluginName: 'wallpaper',
-      events: [
-        { name: 'wallpaper-fetched', type: 'sync' },
-        { name: 'wallpaper-set', type: 'sync' },
-      ],
-    }),
-  ]);
-
   const { listen } = await import('@tauri-apps/api/event');
 
   const unlistenFetched = await listen('wallpaper-fetched', (event) => {

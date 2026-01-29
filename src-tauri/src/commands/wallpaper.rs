@@ -1,5 +1,5 @@
 use crate::services::{cache, wallpaper};
-use crate::types::{WallpaperInfo, WallpaperSource};
+use crate::types::{PaginatedResponse, WallpaperInfo, WallpaperListItem, WallpaperSource};
 use tauri::{AppHandle, Emitter};
 use rand::prelude::IndexedRandom;
 
@@ -101,4 +101,38 @@ pub async fn get_current_wallpaper_path() -> Result<String, String> {
         .map_err(|e| format!("Get wallpaper error: {}", e))?;
 
     Ok(path)
+}
+
+#[tauri::command]
+pub async fn fetch_wallpapers_list(
+    source: String,
+    page: u32,
+    api_key: Option<String>,
+) -> Result<PaginatedResponse<WallpaperListItem>, String> {
+    let wallpaper_source = match source.as_str() {
+        "bing" => WallpaperSource::Bing,
+        "wallhaven" => WallpaperSource::Wallhaven,
+        _ => {
+            return Err("Invalid source".to_string());
+        }
+    };
+
+    let result = match wallpaper_source {
+        WallpaperSource::Bing => {
+            crate::sources::bing::fetch_wallpapers_as_list()
+                .await
+                .map_err(|e| format!("Bing API error: {}", e))?
+        }
+        WallpaperSource::Wallhaven => {
+            let config = crate::sources::wallhaven::WallhavenConfig {
+                api_key: api_key.clone(),
+                ..Default::default()
+            };
+            crate::sources::wallhaven::search_wallpapers_paginated(Some(config), page)
+                .await
+                .map_err(|e| format!("Wallhaven API error: {}", e))?
+        }
+    };
+
+    Ok(result)
 }
