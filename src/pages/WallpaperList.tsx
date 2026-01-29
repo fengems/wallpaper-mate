@@ -14,6 +14,8 @@ import {
   Image as ImageIcon,
   RefreshCw,
   ExternalLink,
+  Heart,
+  DownloadCloud,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -28,6 +30,16 @@ const SOURCES = [
     id: 'wallhaven' as const,
     label: 'Wallhaven',
     color: 'from-orange-500 to-red-600',
+  },
+  {
+    id: 'unsplash' as const,
+    label: 'Unsplash',
+    color: 'from-purple-500 to-pink-500',
+  },
+  {
+    id: 'pixabay' as const,
+    label: 'Pixabay',
+    color: 'from-green-500 to-teal-500',
   },
 ];
 
@@ -46,6 +58,8 @@ export default function WallpaperList() {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [downloading, setDownloading] = useState<Set<string>>(new Set());
 
   const fetchWallpapers = useCallback(async () => {
     setLoading(true);
@@ -70,8 +84,51 @@ export default function WallpaperList() {
   }, [source, page]);
 
   useEffect(() => {
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      setFavorites(new Set(JSON.parse(savedFavorites)));
+    }
+  }, []);
+
+  useEffect(() => {
     fetchWallpapers();
   }, [fetchWallpapers]);
+
+  const toggleFavorite = (id: string) => {
+    const newFavorites = new Set(favorites);
+    if (newFavorites.has(id)) {
+      newFavorites.delete(id);
+    } else {
+      newFavorites.add(id);
+    }
+    setFavorites(newFavorites);
+    localStorage.setItem('favorites', JSON.stringify(Array.from(newFavorites)));
+  };
+
+  const downloadWallpaper = async (item: WallpaperListItem) => {
+    const newDownloading = new Set(downloading);
+    newDownloading.add(item.id);
+    setDownloading(newDownloading);
+
+    try {
+      const response = await fetch(item.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${item.title}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      const newDownloading2 = new Set(downloading);
+      newDownloading2.delete(item.id);
+      setDownloading(newDownloading2);
+    }
+  };
 
   const handleSourceChange = (newSource: string) => {
     setSource(newSource as WallpaperSource);
@@ -186,13 +243,15 @@ export default function WallpaperList() {
               return (
                 <div
                   key={item.id}
-                  className="group relative cursor-pointer"
-                  onClick={() => handleWallpaperClick(item)}
+                  className="group relative"
                   onMouseEnter={() => setHoveredId(item.id)}
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   <div className="relative rounded-2xl overflow-hidden bg-zinc-900/50 border border-white/[0.05] transition-all duration-500 ease-out group-hover:border-white/[0.1] group-hover:shadow-2xl group-hover:shadow-indigo-500/10">
-                    <div className="relative aspect-[16/10] overflow-hidden">
+                    <div
+                      className="relative aspect-[16/10] overflow-hidden cursor-pointer"
+                      onClick={() => handleWallpaperClick(item)}
+                    >
                       {hasError ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-zinc-900/80">
                           <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center">
@@ -253,7 +312,37 @@ export default function WallpaperList() {
                           <span className="px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-sm text-white/70 text-[10px] font-medium">
                             {item.source}
                           </span>
-                          <ExternalLink className="w-3 h-3 text-white/50" />
+                          <ExternalLink
+                            className="w-3 h-3 text-white/50 cursor-pointer hover:text-white/80 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(item.url, '_blank');
+                            }}
+                          />
+                          <Heart
+                            className={cn(
+                              'w-3 h-3 cursor-pointer transition-colors',
+                              favorites.has(item.id)
+                                ? 'text-red-500 fill-red-500'
+                                : 'text-white/50 hover:text-white/80'
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(item.id);
+                            }}
+                          />
+                          <DownloadCloud
+                            className={cn(
+                              'w-3 h-3 cursor-pointer transition-colors',
+                              downloading.has(item.id)
+                                ? 'text-white/80'
+                                : 'text-white/50 hover:text-white/80'
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadWallpaper(item);
+                            }}
+                          />
                         </div>
                       </div>
                     </div>

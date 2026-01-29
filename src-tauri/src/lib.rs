@@ -3,6 +3,11 @@ pub mod services;
 pub mod sources;
 pub mod types;
 
+pub use sources::bing;
+pub use sources::wallhaven;
+pub use sources::unsplash;
+pub use sources::pixabay;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
@@ -56,6 +61,8 @@ pub fn run() {
         commands::wallpaper::set_wallpaper_from_info,
         commands::wallpaper::get_current_wallpaper_path,
         commands::wallpaper::fetch_wallpapers_list,
+        commands::wallpaper::set_auto_switch_config,
+        commands::wallpaper::get_auto_switch_config,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

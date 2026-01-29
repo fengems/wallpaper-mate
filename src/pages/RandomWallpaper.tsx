@@ -10,21 +10,14 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
-
-interface WallpaperInfo {
-  id: string;
-  url: string;
-  thumbUrl: string;
-  title: string;
-  source: string;
-  localPath?: string;
-  cached: boolean;
-}
+import type { WallpaperInfo } from '../types';
 
 // 统一平台顺序：Bing 在前，Wallhaven 在后
 const SOURCES = [
   { id: 'bing', label: 'Bing Daily', color: 'from-blue-500 to-cyan-500' },
   { id: 'wallhaven', label: 'Wallhaven', color: 'from-orange-500 to-red-600' },
+  { id: 'unsplash', label: 'Unsplash', color: 'from-purple-500 to-pink-500' },
+  { id: 'pixabay', label: 'Pixabay', color: 'from-green-500 to-teal-500' },
 ];
 
 export default function RandomWallpaper() {

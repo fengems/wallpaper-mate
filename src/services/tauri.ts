@@ -1,14 +1,22 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { WallpaperInfo, Settings, WallpaperListItem, PaginatedResponse } from '../types';
+import type {
+  WallpaperInfo,
+  Settings,
+  WallpaperListItem,
+  PaginatedResponse,
+} from '../types';
 import type { WallpaperSource } from '../types';
 
-export async function fetchNextWallpaper(source: WallpaperSource, apiKey: string | null = null): Promise<WallpaperInfo> {
-  return invoke('fetch_next_wallpaper', { source: source === 'bing' ? 'bing' : 'wallhaven', apiKey });
+export async function fetchNextWallpaper(
+  source: WallpaperSource,
+  apiKey: string | null = null
+): Promise<WallpaperInfo> {
+  return invoke('fetch_next_wallpaper', { source, apiKey });
 }
 
 export async function fetchWallpapersList(
-  source: WallpaperSource, 
-  page: number, 
+  source: WallpaperSource,
+  page: number,
   apiKey: string | null = null
 ): Promise<PaginatedResponse<WallpaperListItem>> {
   return invoke('fetch_wallpapers_list', { source, page, apiKey });
@@ -22,8 +30,7 @@ export async function getSettings(): Promise<Settings> {
   return { source: 'bing' };
 }
 
-export async function saveSettings(_settings: Settings): Promise<void> {
-}
+export async function saveSettings(_settings: Settings): Promise<void> {}
 
 export async function listenToEvents(callbacks: {
   onWallpaperFetched: (info: WallpaperInfo) => void;
@@ -43,4 +50,34 @@ export async function listenToEvents(callbacks: {
     unlistenFetched();
     unlistenSet();
   };
+}
+
+export async function setAutoSwitchConfig(
+  source: WallpaperSource,
+  enabled: boolean,
+  intervalSeconds: number
+): Promise<void> {
+  return invoke('set_auto_switch_config', { source, enabled, intervalSeconds });
+}
+
+export async function getAutoSwitchConfig(
+  source: WallpaperSource
+): Promise<{ enabled: boolean; intervalSeconds: number } | null> {
+  return invoke('get_auto_switch_config', { source });
+}
+
+export async function stopAutoSwitch(source: WallpaperSource): Promise<void> {
+  return invoke('stop_auto_switch', { source });
+}
+
+export async function isAutoSwitchRunning(
+  source: WallpaperSource
+): Promise<boolean> {
+  return invoke('is_auto_switch_running', { source });
+}
+
+export async function getAutoSwitchInterval(
+  source: WallpaperSource
+): Promise<number | null> {
+  return invoke('get_auto_switch_interval', { source });
 }

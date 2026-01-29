@@ -1,7 +1,20 @@
-use crate::services::{cache, wallpaper};
+use crate::services::{cache, wallpaper, scheduler};
 use crate::types::{PaginatedResponse, WallpaperInfo, WallpaperListItem, WallpaperSource};
 use tauri::{AppHandle, Emitter};
 use rand::prelude::IndexedRandom;
+
+impl WallpaperSource {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "bing" => Some(WallpaperSource::Bing),
+            "wallhaven" => Some(WallpaperSource::Wallhaven),
+            "unsplash" => Some(WallpaperSource::Unsplash),
+            "pixabay" => Some(WallpaperSource::Pixabay),
+            "reddit" => Some(WallpaperSource::Reddit),
+            _ => None,
+        }
+    }
+}
 
 #[tauri::command]
 pub async fn fetch_next_wallpaper(
@@ -31,6 +44,19 @@ pub async fn fetch_next_wallpaper(
             crate::sources::wallhaven::search_wallpapers(Some(config))
                 .await
                 .map_err(|e| format!("Wallhaven API error: {}", e))?
+        }
+        WallpaperSource::Unsplash => {
+            crate::sources::unsplash::fetch_wallpapers(None)
+                .await
+                .map_err(|e| format!("Unsplash API error: {}", e))?
+        }
+        WallpaperSource::Pixabay => {
+            crate::sources::pixabay::fetch_wallpapers(None)
+                .await
+                .map_err(|e| format!("Pixabay API error: {}", e))?
+        }
+        WallpaperSource::Reddit => {
+            return Err("Reddit source not implemented yet".to_string());
         }
     };
 
@@ -82,9 +108,13 @@ pub async fn set_wallpaper_from_info(
     app: AppHandle,
     wallpaper: WallpaperInfo,
 ) -> Result<(), String> {
-    let path = wallpaper
-        .local_path
-        .ok_or("Wallpaper not cached".to_string())?;
+    let path = if let Some(cached_path) = wallpaper.local_path {
+        cached_path
+    } else {
+        cache::download_and_cache(&app, &wallpaper)
+            .await
+            .map_err(|e| format!("Cache error: {}", e))?
+    };
 
     wallpaper::set_wallpaper(&path)
         .map_err(|e| format!("Set wallpaper error: {}", e))?;
@@ -132,7 +162,39 @@ pub async fn fetch_wallpapers_list(
                 .await
                 .map_err(|e| format!("Wallhaven API error: {}", e))?
         }
+        WallpaperSource::Unsplash => {
+            crate::sources::unsplash::fetch_wallpapers_paginated(None, page)
+                .await
+                .map_err(|e| format!("Unsplash API error: {}", e))?
+        }
+        WallpaperSource::Pixabay => {
+            crate::sources::pixabay::fetch_wallpapers_paginated(None, page)
+                .await
+                .map_err(|e| format!("Pixabay API error: {}", e))?
+        }
+        WallpaperSource::Reddit => {
+            return Err("Reddit source not implemented yet".to_string());
+        }
     };
 
     Ok(result)
+}
+
+#[tauri::command]
+pub fn set_auto_switch_config(
+    source: String,
+    enabled: bool,
+    interval_seconds: u64,
+) -> Result<(), String> {
+    let config = scheduler::AutoSwitchConfig {
+        enabled,
+        interval_seconds,
+    };
+    scheduler::get_scheduler().set_config(&source, config);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn get_auto_switch_config(source: String) -> Option<scheduler::AutoSwitchConfig> {
+    scheduler::get_scheduler().get_config(&source)
 }

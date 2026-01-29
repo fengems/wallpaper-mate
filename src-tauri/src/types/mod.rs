@@ -34,6 +34,9 @@ pub struct PaginatedResponse<T> {
 pub enum WallpaperSource {
     Bing,
     Wallhaven,
+    Unsplash,
+    Pixabay,
+    Reddit,
 }
 
 #[derive(Debug, thiserror::Error)]

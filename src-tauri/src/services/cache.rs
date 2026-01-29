@@ -27,6 +27,9 @@ pub async fn download_and_cache<R: tauri::Runtime>(
     let source_dir = cache_dir.join(match wallpaper.source {
         WallpaperSource::Bing => "bing",
         WallpaperSource::Wallhaven => "wallhaven",
+        WallpaperSource::Unsplash => "unsplash",
+        WallpaperSource::Pixabay => "pixabay",
+        WallpaperSource::Reddit => "reddit",
     });
 
     if !source_dir.exists() {

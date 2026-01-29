@@ -1,9 +1,13 @@
 export const WallpaperSource = {
   Bing: 'bing',
   Wallhaven: 'wallhaven',
+  Unsplash: 'unsplash',
+  Pixabay: 'pixabay',
+  Reddit: 'reddit',
 } as const;
 
-export type WallpaperSource = (typeof WallpaperSource)[keyof typeof WallpaperSource];
+export type WallpaperSource =
+  (typeof WallpaperSource)[keyof typeof WallpaperSource];
 
 export interface WallpaperInfo {
   id: string;
