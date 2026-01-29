@@ -29,6 +29,8 @@ struct WallhavenThumbs {
     original: String,
     #[allow(dead_code)]
     large: String,
+    #[allow(dead_code)]
+    small: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -199,7 +201,7 @@ pub async fn search_wallpapers_paginated(
                 title: format!("Wallhaven #{} ({}x{})", img.id, img.dimension_x, img.dimension_y),
                 url: img.path.clone(),
                 source: WallpaperSource::Wallhaven,
-                thumb_url: img.thumbs.large.clone(),
+                thumb_url: img.thumbs.small.clone(),
             }
         })
         .collect();
