@@ -17,6 +17,7 @@ pub struct WallpaperListItem {
     pub title: String,
     pub url: String,
     pub source: WallpaperSource,
+    #[serde(rename = "thumbUrl")]
     pub thumb_url: String,
 }
 

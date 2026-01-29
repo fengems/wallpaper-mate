@@ -39,38 +39,6 @@ pub async fn fetch_wallpapers() -> Result<Vec<WallpaperInfo>, reqwest::Error> {
     Ok(wallpapers)
 }
 
-pub async fn fetch_wallpapers_as_list() -> Result<crate::types::PaginatedResponse<crate::types::WallpaperListItem>, reqwest::Error> {
-    use crate::types::{PaginatedResponse, WallpaperListItem, WallpaperSource};
-
-    let response = reqwest::get(BING_API_URL).await?;
-    let bing_response: BingResponse = response.json().await?;
-
-    let wallpapers: Vec<WallpaperListItem> = bing_response
-        .images
-        .into_iter()
-        .map(|img| {
-            let full_url = format!("https://www.bing.com{}", img.url);
-            WallpaperListItem {
-                id: url_to_id(&img.url),
-                title: img.title.clone(),
-                url: full_url.clone(),
-                source: WallpaperSource::Bing,
-                thumb_url: full_url,
-            }
-        })
-        .collect();
-
-    let total = wallpapers.len() as u32;
-
-    Ok(PaginatedResponse {
-        data: wallpapers,
-        current_page: 1,
-        last_page: 1,
-        per_page: total,
-        total,
-    })
-}
-
 fn url_to_id(url: &str) -> String {
     url.split('/')
         .last()
