@@ -1,5 +1,4 @@
-import { Image as ImageIcon, ChevronDown } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { ImageIcon, ChevronDown } from 'lucide-react';
 
 interface Source {
   id: string;
@@ -22,8 +21,6 @@ export default function PageHeader({
   currentSource,
   onSourceChange,
 }: PageHeaderProps) {
-  const selectedSource = sources.find((s) => s.id === currentSource);
-
   return (
     <header className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-black/20 backdrop-blur-xl z-20">
       <div className="flex items-center gap-4">
@@ -47,7 +44,7 @@ export default function PageHeader({
         <select
           value={currentSource}
           onChange={(e) => onSourceChange(e.target.value)}
-          className="appearance-none bg-zinc-900/80 border border-white/10 text-zinc-200 text-xs font-medium rounded-lg pl-4 pr-10 py-2.5 cursor-pointer hover:bg-zinc-800/80 hover:border-white/20 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          className="appearance-none bg-zinc-800/90 border border-white/10 text-zinc-200 text-xs font-medium rounded-lg pl-4 pr-8 py-2 cursor-pointer hover:bg-zinc-700/90 hover:border-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
         >
           {sources.map((source) => (
             <option key={source.id} value={source.id}>
@@ -55,17 +52,7 @@ export default function PageHeader({
             </option>
           ))}
         </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <ChevronDown className="w-4 h-4 text-zinc-500" />
-        </div>
-        {selectedSource && (
-          <div
-            className={cn(
-              'absolute -bottom-0.5 left-2 right-2 h-0.5 rounded-full bg-gradient-to-r opacity-70',
-              selectedSource.color
-            )}
-          />
-        )}
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none group-hover:text-zinc-300 transition-colors" />
       </div>
     </header>
   );

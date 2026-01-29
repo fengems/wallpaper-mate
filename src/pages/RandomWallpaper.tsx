@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import {
-  Image as ImageIcon,
   Download,
   RefreshCw,
   Monitor,
@@ -10,6 +9,7 @@ import {
   Minimize2,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import PageHeader from '../components/PageHeader';
 
 interface WallpaperInfo {
   id: string;
@@ -17,10 +17,11 @@ interface WallpaperInfo {
   thumbUrl: string;
   title: string;
   source: string;
-  localPath?: string; // Optional local path if cached
+  localPath?: string;
   cached: boolean;
 }
 
+// 统一平台顺序：Bing 在前，Wallhaven 在后
 const SOURCES = [
   { id: 'bing', label: 'Bing Daily', color: 'from-blue-500 to-cyan-500' },
   { id: 'wallhaven', label: 'Wallhaven', color: 'from-orange-500 to-red-600' },
@@ -36,6 +37,7 @@ export default function RandomWallpaper() {
     message: string;
     type: 'success' | 'error';
   } | null>(null);
+
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
@@ -116,49 +118,13 @@ export default function RandomWallpaper() {
 
   return (
     <div className="flex flex-col flex-1 relative">
-      <header className="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-6 bg-black/20 backdrop-blur-xl z-20">
-        <div className="flex items-center gap-4">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center border border-white/10">
-              <ImageIcon className="w-5 h-5 text-indigo-400" />
-            </div>
-          </div>
-          <div>
-            <h1 className="text-sm font-semibold text-zinc-100 tracking-tight">
-              随机壁纸
-            </h1>
-            <p className="text-[10px] text-zinc-500 font-mono tracking-wider">
-              Random
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {SOURCES.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => handleSourceChange(s.id)}
-              className={cn(
-                'relative px-4 py-1.5 rounded-lg text-xs font-medium transition-all duration-300',
-                source === s.id
-                  ? 'text-white'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              )}
-            >
-              {source === s.id && (
-                <span
-                  className={cn(
-                    'absolute inset-0 bg-gradient-to-r rounded-lg opacity-90',
-                    s.color
-                  )}
-                />
-              )}
-              <span className="relative">{s.label}</span>
-            </button>
-          ))}
-        </div>
-      </header>
+      <PageHeader
+        title="随机壁纸"
+        subtitle="Random"
+        sources={SOURCES}
+        currentSource={source}
+        onSourceChange={handleSourceChange}
+      />
 
       <main className="flex-1 min-h-0 relative group p-4 flex items-center justify-center bg-zinc-950/20">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-900/20 via-zinc-950/50 to-zinc-950 pointer-events-none" />
@@ -207,75 +173,45 @@ export default function RandomWallpaper() {
         <button
           onClick={() => fetchNextWallpaper()}
           disabled={loading}
-          className="group flex flex-col items-center gap-1.5 p-2 rounded-xl text-zinc-500 hover:text-zinc-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-colors"
         >
-          <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:bg-zinc-800 group-hover:border-zinc-700 transition-all group-active:scale-95">
-            <RefreshCw
-              className={cn(
-                'w-4 h-4 transition-transform duration-700',
-                loading && 'animate-spin'
-              )}
-            />
-          </div>
-          <span className="text-[10px] font-medium">换一张</span>
+          <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
+          换一张
         </button>
 
         <button
           onClick={handleSetWallpaper}
           disabled={!currentWallpaper || loading}
-          className="group flex flex-col items-center gap-1.5 p-2 rounded-xl text-zinc-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-200 text-xs font-medium rounded-lg transition-colors"
         >
-          <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center shadow-lg shadow-white/5 group-hover:shadow-white/20 group-hover:scale-105 transition-all group-active:scale-95">
-            <Download className="w-5 h-5 text-black" />
-          </div>
-          <span className="text-[10px] font-medium">设为壁纸</span>
+          <Download className="w-4 h-4" />
+          设为壁纸
         </button>
       </footer>
 
-      {toast && (
-        <div
-          className={cn(
-            'absolute top-20 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full backdrop-blur-md border shadow-xl text-xs font-medium z-50 flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300',
-            toast.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-              : 'bg-red-500/10 border-red-500/20 text-red-400'
-          )}
-        >
-          {toast.type === 'success' && (
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          )}
-          {toast.type === 'error' && (
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          )}
-          {toast.message}
-        </div>
-      )}
-
       {isPreviewOpen && currentWallpaper && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm animate-in fade-in duration-300 cursor-zoom-out"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
           onClick={() => setIsPreviewOpen(false)}
         >
           <button
             onClick={() => setIsPreviewOpen(false)}
-            className="absolute top-6 right-6 p-1.5 rounded-md text-white/50 hover:bg-zinc-800/50 hover:text-white transition-colors duration-200 z-50"
+            className="absolute top-6 right-6 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             <Minimize2 className="w-5 h-5" />
           </button>
 
           <img
-            src={currentWallpaper.localPath || currentWallpaper.url}
+            src={currentWallpaper.url}
             alt={currentWallpaper.title}
-            className="max-w-full max-h-screen w-auto h-auto object-contain shadow-2xl"
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
           />
 
-          <div
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full bg-zinc-950/30 backdrop-blur-xl border border-white/10 text-white/90 text-sm font-medium shadow-2xl shadow-black/20 animate-in slide-in-from-bottom-4 fade-in duration-500 hover:bg-zinc-950/50 transition-colors cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="drop-shadow-md tracking-wide">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-black/60 backdrop-blur-md rounded-full">
+            <p className="text-white/90 text-sm font-medium">
               {currentWallpaper.title}
-            </span>
+            </p>
           </div>
         </div>
       )}
