@@ -18,6 +18,8 @@ import {
   DownloadCloud,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useAppStore } from '../store/appStore';
+import { getCachedImage, setCachedImage } from '../utils/imageCache';
 
 // 统一平台顺序：Bing 在前，Wallhaven 在后
 const SOURCES = [
@@ -44,7 +46,8 @@ const SOURCES = [
 ];
 
 export default function WallpaperList() {
-  const [source, setSource] = useState<WallpaperSource>('bing');
+  const { listPageSource, setListPageSource, favorites, toggleFavorite } =
+    useAppStore();
   const [wallpapers, setWallpapers] = useState<WallpaperListItem[]>([]);
   const [page, setPage] = useState<number>(1);
   const [pagination, setPagination] = useState<Omit<
@@ -58,13 +61,16 @@ export default function WallpaperList() {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [downloading, setDownloading] = useState<Set<string>>(new Set());
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
   const fetchWallpapers = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetchWallpapersList(source, page);
+      const response = await fetchWallpapersList(
+        listPageSource as WallpaperSource,
+        page
+      );
       setWallpapers(response.data);
       setPagination({
         currentPage: response.currentPage,
@@ -81,28 +87,17 @@ export default function WallpaperList() {
     } finally {
       setLoading(false);
     }
-  }, [source, page]);
+  }, [listPageSource, page]);
 
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(new Set(JSON.parse(savedFavorites)));
+    if (!hasLoaded) {
+      fetchWallpapers();
+      setHasLoaded(true);
     }
   }, []);
 
-  useEffect(() => {
+  const handleRefresh = () => {
     fetchWallpapers();
-  }, [fetchWallpapers]);
-
-  const toggleFavorite = (id: string) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(id)) {
-      newFavorites.delete(id);
-    } else {
-      newFavorites.add(id);
-    }
-    setFavorites(newFavorites);
-    localStorage.setItem('favorites', JSON.stringify(Array.from(newFavorites)));
   };
 
   const downloadWallpaper = async (item: WallpaperListItem) => {
@@ -131,7 +126,7 @@ export default function WallpaperList() {
   };
 
   const handleSourceChange = (newSource: string) => {
-    setSource(newSource as WallpaperSource);
+    setListPageSource(newSource);
     setPage(1);
   };
 
@@ -172,8 +167,13 @@ export default function WallpaperList() {
     });
   };
 
-  const handleImageLoadStart = (id: string) => {
+  const handleImageLoadStart = async (id: string, url: string) => {
     setImageLoading((prev) => new Set([...prev, id]));
+
+    const cachedUrl = getCachedImage(url);
+    if (!cachedUrl) {
+      await setCachedImage(url);
+    }
   };
 
   const handleImageLoad = (id: string) => {
@@ -210,7 +210,7 @@ export default function WallpaperList() {
         title="壁纸探索"
         subtitle="Explorer"
         sources={SOURCES}
-        currentSource={source}
+        currentSource={listPageSource}
         onSourceChange={handleSourceChange}
       />
 
@@ -226,12 +226,21 @@ export default function WallpaperList() {
               </p>
             </div>
           </div>
-        ) : wallpapers.length === 0 ? (
+        ) : hasLoaded && wallpapers.length === 0 ? (
           <div className="relative z-10 flex flex-col justify-center items-center h-full gap-4">
             <div className="w-16 h-16 rounded-2xl bg-zinc-900/50 flex items-center justify-center border border-white/5">
               <ImageIcon className="w-8 h-8 text-zinc-600" />
             </div>
             <p className="text-zinc-500 text-sm">暂无壁纸</p>
+          </div>
+        ) : !hasLoaded ? (
+          <div className="relative z-10 flex justify-center items-center h-full">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
+              <p className="text-xs font-medium tracking-widest uppercase text-zinc-500">
+                加载中...
+              </p>
+            </div>
           </div>
         ) : (
           <div className="relative z-10 grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-5">
@@ -279,7 +288,9 @@ export default function WallpaperList() {
                             )}
                             loading="lazy"
                             onLoad={() => handleImageLoad(item.id)}
-                            onLoadStart={() => handleImageLoadStart(item.id)}
+                            onLoadStart={() =>
+                              handleImageLoadStart(item.id, item.thumbUrl)
+                            }
                             onError={() => handleImageError(item.id)}
                           />
                           {isLoading && (
@@ -322,7 +333,7 @@ export default function WallpaperList() {
                           <Heart
                             className={cn(
                               'w-3 h-3 cursor-pointer transition-colors',
-                              favorites.has(item.id)
+                              favorites.includes(item.id)
                                 ? 'text-red-500 fill-red-500'
                                 : 'text-white/50 hover:text-white/80'
                             )}
@@ -355,6 +366,18 @@ export default function WallpaperList() {
       </main>
 
       <footer className="h-16 shrink-0 border-t border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-center gap-6 z-20">
+        <button
+          onClick={handleRefresh}
+          disabled={loading}
+          className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          title="刷新壁纸列表"
+        >
+          <div className="w-8 h-8 rounded-lg bg-zinc-800/50 border border-white/5 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
+            <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
+          </div>
+          <span className="text-xs font-medium">刷新</span>
+        </button>
+
         <button
           onClick={handlePrevPage}
           disabled={page === 1 || loading}

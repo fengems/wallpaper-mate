@@ -21,7 +21,7 @@ const SOURCES = [
 ];
 
 export default function RandomWallpaper() {
-  const { selectedSource, setSelectedSource } = useAppStore();
+  const { randomPageSource, setRandomPageSource } = useAppStore();
   const [currentWallpaper, setCurrentWallpaper] =
     useState<WallpaperInfo | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,6 +30,7 @@ export default function RandomWallpaper() {
     message: string;
     type: 'success' | 'error';
   } | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
     if (toast) {
@@ -68,12 +69,15 @@ export default function RandomWallpaper() {
 
     const cleanup = setupListeners();
 
-    fetchNextWallpaper(selectedSource);
+    if (!hasLoaded) {
+      fetchNextWallpaper(randomPageSource);
+      setHasLoaded(true);
+    }
 
     return () => {
       cleanup.then((unlisten) => unlisten());
     };
-  }, [selectedSource]);
+  }, []);
 
   const fetchNextWallpaper = async (targetSource: string) => {
     setLoading(true);
@@ -90,8 +94,8 @@ export default function RandomWallpaper() {
   };
 
   const handleSourceChange = (newSource: string) => {
-    setSelectedSource(newSource);
-    if (newSource !== selectedSource) {
+    setRandomPageSource(newSource);
+    if (newSource !== randomPageSource) {
       fetchNextWallpaper(newSource);
     }
   };
@@ -115,7 +119,7 @@ export default function RandomWallpaper() {
         title="随机壁纸"
         subtitle="Random"
         sources={SOURCES}
-        currentSource={selectedSource}
+        currentSource={randomPageSource}
         onSourceChange={handleSourceChange}
       />
 
@@ -164,7 +168,7 @@ export default function RandomWallpaper() {
 
       <footer className="h-20 shrink-0 border-t border-zinc-800/50 bg-zinc-950/40 flex items-center justify-center gap-6 z-20">
         <button
-          onClick={() => fetchNextWallpaper(selectedSource)}
+          onClick={() => fetchNextWallpaper(randomPageSource)}
           disabled={loading}
           className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-colors"
         >

@@ -2,13 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export interface AppState {
-  selectedSource: string;
+  randomPageSource: string;
+  listPageSource: string;
   selectedInterval: number;
   favorites: string[];
 }
 
 export interface AppActions {
-  setSelectedSource: (source: string) => void;
+  setRandomPageSource: (source: string) => void;
+  setListPageSource: (source: string) => void;
   setSelectedInterval: (interval: number) => void;
   toggleFavorite: (id: string) => void;
 }
@@ -16,7 +18,8 @@ export interface AppActions {
 export type AppStore = AppState & AppActions;
 
 const initialState: AppState = {
-  selectedSource: 'bing',
+  randomPageSource: 'bing',
+  listPageSource: 'bing',
   selectedInterval: 3600,
   favorites: [],
 };
@@ -26,7 +29,9 @@ export const useAppStore = create<AppStore>()(
     (set) => ({
       ...initialState,
 
-      setSelectedSource: (source) => set({ selectedSource: source }),
+      setRandomPageSource: (source) => set({ randomPageSource: source }),
+
+      setListPageSource: (source) => set({ listPageSource: source }),
 
       setSelectedInterval: (interval) => set({ selectedInterval: interval }),
 
@@ -40,7 +45,8 @@ export const useAppStore = create<AppStore>()(
     {
       name: 'wallpaper-mate-storage',
       partialize: (state) => ({
-        selectedSource: state.selectedSource,
+        randomPageSource: state.randomPageSource,
+        listPageSource: state.listPageSource,
         selectedInterval: state.selectedInterval,
         favorites: state.favorites,
       }),
