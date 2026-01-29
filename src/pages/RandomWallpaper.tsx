@@ -11,8 +11,8 @@ import {
 import { cn } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
 import type { WallpaperInfo } from '../types';
+import { useAppStore } from '../store/appStore';
 
-// 统一平台顺序：Bing 在前，Wallhaven 在后
 const SOURCES = [
   { id: 'bing', label: 'Bing Daily', color: 'from-blue-500 to-cyan-500' },
   { id: 'wallhaven', label: 'Wallhaven', color: 'from-orange-500 to-red-600' },
@@ -21,10 +21,10 @@ const SOURCES = [
 ];
 
 export default function RandomWallpaper() {
+  const { selectedSource, setSelectedSource } = useAppStore();
   const [currentWallpaper, setCurrentWallpaper] =
     useState<WallpaperInfo | null>(null);
   const [loading, setLoading] = useState(false);
-  const [source, setSource] = useState('bing');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
@@ -68,14 +68,14 @@ export default function RandomWallpaper() {
 
     const cleanup = setupListeners();
 
-    fetchNextWallpaper();
+    fetchNextWallpaper(selectedSource);
 
     return () => {
       cleanup.then((unlisten) => unlisten());
     };
-  }, []);
+  }, [selectedSource]);
 
-  const fetchNextWallpaper = async (targetSource = source) => {
+  const fetchNextWallpaper = async (targetSource: string) => {
     setLoading(true);
     try {
       await invoke('fetch_next_wallpaper', {
@@ -90,8 +90,8 @@ export default function RandomWallpaper() {
   };
 
   const handleSourceChange = (newSource: string) => {
-    setSource(newSource);
-    if (newSource !== source) {
+    setSelectedSource(newSource);
+    if (newSource !== selectedSource) {
       fetchNextWallpaper(newSource);
     }
   };
@@ -115,7 +115,7 @@ export default function RandomWallpaper() {
         title="随机壁纸"
         subtitle="Random"
         sources={SOURCES}
-        currentSource={source}
+        currentSource={selectedSource}
         onSourceChange={handleSourceChange}
       />
 
@@ -164,7 +164,7 @@ export default function RandomWallpaper() {
 
       <footer className="h-20 shrink-0 border-t border-zinc-800/50 bg-zinc-950/40 flex items-center justify-center gap-6 z-20">
         <button
-          onClick={() => fetchNextWallpaper()}
+          onClick={() => fetchNextWallpaper(selectedSource)}
           disabled={loading}
           className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-lg transition-colors"
         >
