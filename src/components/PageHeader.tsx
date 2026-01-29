@@ -97,7 +97,7 @@ export default function PageHeader({
                   key={source.id}
                   onClick={() => handleSelect(source.id)}
                   className={cn(
-                    'w-full flex items-center justify-between px-4 py-1.5 text-xs rounded-lg transition-colors',
+                    'w-full flex items-center justify-between px-4 h-10 text-xs rounded-lg transition-colors',
                     source.id === currentSource
                       ? 'bg-gradient-to-r text-white from-indigo-500 to-purple-500'
                       : 'text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-200'
@@ -111,6 +111,7 @@ export default function PageHeader({
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       strokeWidth={3}
+                      className="w-4 h-4"
                     >
                       <path
                         strokeLinecap="round"
