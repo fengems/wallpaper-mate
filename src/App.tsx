@@ -220,8 +220,8 @@ function AppComponent() {
             disabled={!currentWallpaper || loading}
             className="group flex flex-col items-center gap-1.5 p-2 rounded-xl text-zinc-300 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center shadow-lg shadow-white/5 group-hover:shadow-white/20 group-hover:scale-105 transition-all group-active:scale-95">
-              <Download className="w-5 h-5 text-black" />
+            <div className="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shadow-lg shadow-black/20 group-hover:bg-zinc-700 group-hover:border-zinc-600 transition-all group-active:scale-95">
+              <Download className="w-4 h-4 text-zinc-200" />
             </div>
             <span className="text-[10px] font-medium">设为壁纸</span>
           </button>
