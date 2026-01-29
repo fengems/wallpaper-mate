@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchWallpapersList, setWallpaper } from '../services/tauri';
 import type {
   WallpaperSource,
@@ -63,8 +63,6 @@ export default function WallpaperList() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<Set<string>>(new Set());
   const [hasLoaded, setHasLoaded] = useState<boolean>(false);
-  const lastSourceRef = useRef<string>(listPageSource);
-  const isUserActionRef = useRef(false);
 
   const fetchWallpapers = useCallback(async () => {
     setLoading(true);
@@ -89,7 +87,7 @@ export default function WallpaperList() {
     } finally {
       setLoading(false);
     }
-  }, [listPageSource, page]);
+  }, []);
 
   useEffect(() => {
     if (!hasLoaded) {
@@ -97,21 +95,6 @@ export default function WallpaperList() {
       setHasLoaded(true);
     }
   }, []);
-
-  useEffect(() => {
-    if (!hasLoaded) return;
-
-    const sourceChanged = listPageSource !== lastSourceRef.current;
-    const isUserAction = isUserActionRef.current;
-
-    if (sourceChanged && isUserAction) {
-      fetchWallpapers();
-      isUserActionRef.current = false;
-      lastSourceRef.current = listPageSource;
-    } else if (!sourceChanged) {
-      lastSourceRef.current = listPageSource;
-    }
-  }, [listPageSource, page, hasLoaded, fetchWallpapers]);
 
   const handleRefresh = () => {
     fetchWallpapers();
@@ -143,9 +126,9 @@ export default function WallpaperList() {
   };
 
   const handleSourceChange = (newSource: string) => {
-    isUserActionRef.current = true;
     setListPageSource(newSource);
     setPage(1);
+    fetchWallpapers();
   };
 
   const handlePrevPage = () => {
