@@ -96,6 +96,12 @@ export default function WallpaperList() {
     }
   }, []);
 
+  useEffect(() => {
+    if (hasLoaded) {
+      fetchWallpapers();
+    }
+  }, [listPageSource, page]);
+
   const handleRefresh = () => {
     fetchWallpapers();
   };
