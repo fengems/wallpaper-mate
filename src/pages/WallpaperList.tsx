@@ -132,12 +132,16 @@ export default function WallpaperList() {
   };
 
   const handlePrevPage = () => {
-    setPage((prev) => Math.max(1, prev - 1));
+    if (page > 1) {
+      setPage((prev) => prev - 1);
+      setTimeout(() => fetchWallpapers(), 0);
+    }
   };
 
   const handleNextPage = () => {
     if (pagination && page < pagination.lastPage) {
       setPage((prev) => prev + 1);
+      setTimeout(() => fetchWallpapers(), 0);
     }
   };
 
