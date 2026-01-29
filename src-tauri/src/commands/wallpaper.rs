@@ -119,7 +119,7 @@ pub async fn fetch_wallpapers_list(
 
     let result = match wallpaper_source {
         WallpaperSource::Bing => {
-            crate::sources::bing::fetch_wallpapers_as_list()
+            crate::sources::bing::fetch_wallpapers_as_list(page)
                 .await
                 .map_err(|e| format!("Bing API error: {}", e))?
         }

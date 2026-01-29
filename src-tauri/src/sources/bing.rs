@@ -39,10 +39,26 @@ pub async fn fetch_wallpapers() -> Result<Vec<WallpaperInfo>, reqwest::Error> {
     Ok(wallpapers)
 }
 
-pub async fn fetch_wallpapers_as_list() -> Result<crate::types::PaginatedResponse<crate::types::WallpaperListItem>, reqwest::Error> {
+pub async fn fetch_wallpapers_as_list(page: u32) -> Result<crate::types::PaginatedResponse<crate::types::WallpaperListItem>, reqwest::Error> {
     use crate::types::{PaginatedResponse, WallpaperListItem, WallpaperSource};
 
-    let response = reqwest::get(BING_API_URL).await?;
+    // Bing API 只返回最近 8 天的壁纸，idx 参数表示偏移量
+    // idx 范围是 0-7，超过这个范围就没有数据了
+    let idx = (page - 1) * 8;
+    let url = if idx < 8 {
+        format!("https://www.bing.com/HPImageArchive.aspx?format=js&idx={}&n=8&mkt=zh-CN", idx)
+    } else {
+        // 如果超出范围，返回空数据
+        return Ok(PaginatedResponse {
+            data: vec![],
+            current_page: page,
+            last_page: 1,
+            per_page: 8,
+            total: 0,
+        });
+    };
+
+    let response = reqwest::get(&url).await?;
     let bing_response: BingResponse = response.json().await?;
 
     let wallpapers: Vec<WallpaperListItem> = bing_response
@@ -61,12 +77,14 @@ pub async fn fetch_wallpapers_as_list() -> Result<crate::types::PaginatedRespons
         .collect();
 
     let total = wallpapers.len() as u32;
+    // Bing 最多只有 8 天的数据
+    let last_page = if total > 0 { 1 } else { 1 };
 
     Ok(PaginatedResponse {
         data: wallpapers,
-        current_page: 1,
-        last_page: 1,
-        per_page: total,
+        current_page: page,
+        last_page,
+        per_page: 8,
         total,
     })
 }
