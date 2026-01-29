@@ -7,27 +7,15 @@ const PIXABAY_API_KEY: &str = "YOUR_API_KEY";
 #[derive(Debug, Deserialize)]
 struct PixabayPhoto {
     id: u32,
-    #[serde(rename = "pageURL")]
-    page_url: String,
-    #[serde(rename = "type")]
-    photo_type: String,
-    tags: String,
     #[serde(rename = "webformatURL")]
     webformat_url: String,
-    #[serde(rename = "largeImageURL")]
-    large_image_url: String,
     #[serde(rename = "fullHDURL")]
     full_hd_url: String,
-    #[serde(rename = "imageWidth")]
-    image_width: u32,
-    #[serde(rename = "imageHeight")]
-    image_height: u32,
     user: String,
 }
 
 #[derive(Debug, Deserialize)]
 struct PixabayResponse {
-    total: u32,
     #[serde(rename = "totalHits")]
     total_hits: u32,
     hits: Vec<PixabayPhoto>,

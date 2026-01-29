@@ -11,22 +11,16 @@ struct UnsplashPhoto {
     height: u32,
     urls: UnsplashUrls,
     user: UnsplashUser,
-    #[serde(rename = "created_at")]
-    created_at: String,
 }
 
 #[derive(Debug, Deserialize)]
 struct UnsplashUrls {
-    raw: String,
-    full: String,
     regular: String,
     small: String,
-    thumb: String,
 }
 
 #[derive(Debug, Deserialize)]
 struct UnsplashUser {
-    username: String,
     name: String,
 }
 
