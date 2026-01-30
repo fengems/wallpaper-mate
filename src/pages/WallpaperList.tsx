@@ -69,6 +69,17 @@ export default function WallpaperList() {
   const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<Set<string>>(new Set());
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const { wallpapers, page, pagination, loaded } = listPageData;
 
@@ -223,15 +234,17 @@ export default function WallpaperList() {
     if (previewWallpaper) {
       try {
         await setWallpaper(previewWallpaper);
+        setToast({ message: '壁纸设置成功', type: 'success' });
         closePreviewModal();
       } catch (error) {
         console.error('Failed to set wallpaper:', error);
+        setToast({ message: `设置失败: ${error}`, type: 'error' });
       }
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+    <div className="flex flex-col h-full relative bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       <PageHeader
         title="壁纸探索"
         subtitle="Explorer"
@@ -461,6 +474,21 @@ export default function WallpaperList() {
           onClose={closePreviewModal}
           onSetWallpaper={handleSetWallpaper}
         />
+      )}
+
+      {toast && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div
+            className={cn(
+              'px-4 py-2 rounded-lg shadow-lg text-sm font-medium',
+              toast.type === 'success'
+                ? 'bg-emerald-500/90 text-white'
+                : 'bg-red-500/90 text-white'
+            )}
+          >
+            {toast.message}
+          </div>
+        </div>
       )}
     </div>
   );

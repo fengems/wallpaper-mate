@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listen } from '@tauri-apps/api/event';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import {
   Download,
   RefreshCw,
@@ -139,7 +139,11 @@ export default function RandomWallpaper() {
           <div className="relative max-w-full max-h-full flex flex-col items-center justify-center z-10 transition-all duration-500">
             <div className="relative rounded-lg overflow-hidden shadow-2xl shadow-black ring-1 ring-white/10 group-hover:ring-white/20 transition-all duration-500">
               <img
-                src={randomPageWallpaper.localPath || randomPageWallpaper.url}
+                src={
+                  randomPageWallpaper.localPath
+                    ? convertFileSrc(randomPageWallpaper.localPath)
+                    : randomPageWallpaper.url
+                }
                 alt={randomPageWallpaper.title}
                 className={cn(
                   'max-w-full max-h-[calc(92vh-9rem)] w-auto h-auto object-contain transition-all duration-700 ease-out cursor-zoom-in',
@@ -218,6 +222,20 @@ export default function RandomWallpaper() {
             <p className="text-white/90 text-sm font-medium">
               {randomPageWallpaper.title}
             </p>
+          </div>
+        </div>
+      )}
+      {toast && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div
+            className={cn(
+              'px-4 py-2 rounded-lg shadow-lg text-sm font-medium',
+              toast.type === 'success'
+                ? 'bg-emerald-500/90 text-white'
+                : 'bg-red-500/90 text-white'
+            )}
+          >
+            {toast.message}
           </div>
         </div>
       )}

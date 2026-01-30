@@ -15,6 +15,17 @@ export default function Downloads() {
     useAppStore();
   const [loading, setLoading] = useState(true);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   useEffect(() => {
     loadDownloads();
@@ -68,8 +79,10 @@ export default function Downloads() {
   const handleSetWallpaper = async (wallpaper: WallpaperInfo) => {
     try {
       await invoke('set_wallpaper_from_info', { wallpaper });
+      setToast({ message: '壁纸设置成功', type: 'success' });
     } catch (error) {
       console.error('Failed to set wallpaper:', error);
+      setToast({ message: `设置失败: ${error}`, type: 'error' });
     }
   };
 
@@ -82,7 +95,7 @@ export default function Downloads() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+    <div className="flex flex-col h-full relative bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       <header className="h-16 shrink-0 border-b border-white/5 bg-black/20 backdrop-blur-xl flex items-center px-6">
         <h1 className="text-lg font-semibold text-white">下载列表</h1>
         <span className="ml-3 text-xs text-zinc-500">
@@ -180,6 +193,21 @@ export default function Downloads() {
           </div>
         )}
       </main>
+
+      {toast && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div
+            className={cn(
+              'px-4 py-2 rounded-lg shadow-lg text-sm font-medium',
+              toast.type === 'success'
+                ? 'bg-emerald-500/90 text-white'
+                : 'bg-red-500/90 text-white'
+            )}
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
