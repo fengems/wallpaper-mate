@@ -33,6 +33,7 @@ pub struct PaginatedResponse<T> {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
 pub enum WallpaperSource {
     Bing,
     Wallhaven,
