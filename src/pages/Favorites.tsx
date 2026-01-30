@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { Heart, Image as ImageIcon } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
 import type { WallpaperInfo } from '../types';
@@ -27,11 +27,11 @@ export default function Favorites() {
 
   const getImageUrl = (item: WallpaperInfo) => {
     if (item.localPath) {
-      return `file://${item.localPath}`;
+      return convertFileSrc(item.localPath);
     }
     const localPath = getDownloadLocalPath(item.id);
     if (localPath) {
-      return `file://${localPath}`;
+      return convertFileSrc(localPath);
     }
     return item.url;
   };

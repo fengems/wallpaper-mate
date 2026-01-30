@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, convertFileSrc } from '@tauri-apps/api/core';
 import { Trash2, FolderOpen, Heart, Image as ImageIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAppStore } from '../store/appStore';
@@ -120,7 +120,7 @@ export default function Downloads() {
                       </div>
                     ) : (
                       <img
-                        src={`file://${item.localPath}`}
+                        src={convertFileSrc(item.localPath)}
                         alt={item.title}
                         className="w-full h-full object-cover"
                         onError={() => handleImageError(item.id)}
