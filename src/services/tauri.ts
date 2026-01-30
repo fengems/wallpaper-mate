@@ -79,5 +79,20 @@ export async function isAutoSwitchRunning(
 export async function getAutoSwitchInterval(
   source: WallpaperSource
 ): Promise<number | null> {
-  return invoke('get_auto_switch_interval', { source });
+  return invoke<number | null>('get_auto_switch_interval', { source });
+}
+
+export async function listDownloads(): Promise<
+  Array<{ id: string; path: string }>
+> {
+  const result = await invoke<Array<[string, string]>>('list_downloads');
+  return result.map(([id, path]) => ({ id, path }));
+}
+
+export async function deleteDownload(id: string): Promise<boolean> {
+  return invoke<boolean>('delete_download', { id });
+}
+
+export async function revealInFinder(path: string): Promise<void> {
+  return invoke('reveal_in_finder', { path });
 }

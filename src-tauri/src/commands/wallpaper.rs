@@ -198,3 +198,26 @@ pub fn set_auto_switch_config(
 pub fn get_auto_switch_config(source: String) -> Option<scheduler::AutoSwitchConfig> {
     scheduler::get_scheduler().get_config(&source)
 }
+
+#[tauri::command]
+pub fn list_downloads(app: AppHandle) -> Result<Vec<(String, String)>, String> {
+    let files = cache::list_cached_files(&app)
+        .map_err(|e| format!("Failed to list downloads: {}", e))?;
+    
+    Ok(files.into_iter()
+        .map(|(id, path)| (id, path.to_string_lossy().to_string()))
+        .collect())
+}
+
+#[tauri::command]
+pub fn delete_download(app: AppHandle, id: String) -> Result<bool, String> {
+    cache::delete_cached_file(&app, &id)
+        .map_err(|e| format!("Failed to delete download: {}", e))
+}
+
+#[tauri::command]
+pub fn reveal_in_finder(path: String) -> Result<(), String> {
+    let path_buf = std::path::PathBuf::from(path);
+    cache::reveal_in_finder(&path_buf)
+        .map_err(|e| format!("Failed to reveal in finder: {}", e))
+}

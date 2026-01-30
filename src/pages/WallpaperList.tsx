@@ -55,8 +55,8 @@ export default function WallpaperList() {
   const {
     listPageSource,
     setListPageSource,
-    favorites,
     toggleFavorite,
+    isFavorite,
     listPageData,
     setListPageData,
   } = useAppStore();
@@ -359,13 +359,21 @@ export default function WallpaperList() {
                           <Heart
                             className={cn(
                               'w-3 h-3 cursor-pointer transition-colors',
-                              favorites.includes(item.id)
+                              isFavorite(item.id)
                                 ? 'text-red-500 fill-red-500'
                                 : 'text-white/50 hover:text-white/80'
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
-                              toggleFavorite(item.id);
+                              const wallpaperInfo: WallpaperInfo = {
+                                id: item.id,
+                                title: item.title,
+                                url: item.url,
+                                source: item.source,
+                                localPath: undefined,
+                                cached: false,
+                              };
+                              toggleFavorite(wallpaperInfo);
                             }}
                           />
                           <DownloadCloud

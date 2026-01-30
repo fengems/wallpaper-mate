@@ -70,6 +70,53 @@ pub fn clean_cache<R: tauri::Runtime>(app: &impl Manager<R>) -> Result<(), Wallp
     Ok(())
 }
 
+pub fn list_cached_files<R: tauri::Runtime>(app: &impl Manager<R>) -> Result<Vec<(String, PathBuf)>, WallpaperError> {
+    let cache_dir = get_cache_dir(app)?;
+    let mut files = Vec::new();
+
+    for source in ["bing", "wallhaven", "unsplash", "pixabay", "reddit"] {
+        let source_dir = cache_dir.join(source);
+        if source_dir.exists() {
+            if let Ok(entries) = fs::read_dir(&source_dir) {
+                for entry in entries.flatten() {
+                    if let Ok(metadata) = entry.metadata() {
+                        if metadata.is_file() {
+                            let file_name = entry.file_name().to_string_lossy().to_string();
+                            let id = file_name.trim_end_matches(".jpg").to_string();
+                            files.push((id, entry.path()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(files)
+}
+
+pub fn delete_cached_file<R: tauri::Runtime>(app: &impl Manager<R>, id: &str) -> Result<bool, WallpaperError> {
+    if let Some(path) = get_cached_path(app, id) {
+        if path.exists() {
+            fs::remove_file(&path)?;
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+pub fn reveal_in_finder(path: &PathBuf) -> Result<(), WallpaperError> {
+    if !path.exists() {
+        return Err(WallpaperError::ApiError("File not found".to_string()));
+    }
+
+    std::process::Command::new("open")
+        .args(&["-R", path.to_str().unwrap_or("")])
+        .spawn()
+        .map_err(|e| WallpaperError::IoError(e))?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
