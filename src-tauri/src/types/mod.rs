@@ -22,6 +22,7 @@ pub struct WallpaperListItem {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PaginatedResponse<T> {
     pub data: Vec<T>,
     pub current_page: u32,
