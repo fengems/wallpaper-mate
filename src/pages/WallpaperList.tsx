@@ -73,11 +73,14 @@ export default function WallpaperList() {
   const { wallpapers, page, pagination, loaded } = listPageData;
 
   const fetchWallpapers = useCallback(
-    async (targetPage: number = page) => {
+    async (
+      targetPage: number = page,
+      targetSource: string = listPageSource
+    ) => {
       setLoading(true);
       try {
         const response = await fetchWallpapersList(
-          listPageSource as WallpaperSource,
+          targetSource as WallpaperSource,
           targetPage
         );
         setListPageData({
@@ -144,7 +147,7 @@ export default function WallpaperList() {
   const handleSourceChange = (newSource: string) => {
     setListPageSource(newSource);
     setListPageData({ page: 1 });
-    setTimeout(() => fetchWallpapers(1), 0);
+    setTimeout(() => fetchWallpapers(1, newSource), 0);
   };
 
   const handlePrevPage = () => {
