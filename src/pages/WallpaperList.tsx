@@ -25,23 +25,31 @@ const SOURCES = [
     id: 'bing' as const,
     label: 'Bing Daily',
     color: 'from-blue-500 to-cyan-500',
+    supportsPagination: false,
   },
   {
     id: 'wallhaven' as const,
     label: 'Wallhaven',
     color: 'from-orange-500 to-red-600',
+    supportsPagination: true,
   },
   {
     id: 'unsplash' as const,
     label: 'Unsplash',
     color: 'from-purple-500 to-pink-500',
+    supportsPagination: false,
   },
   {
     id: 'pixabay' as const,
     label: 'Pixabay',
     color: 'from-green-500 to-teal-500',
+    supportsPagination: false,
   },
 ];
+
+const supportsPagination = (sourceId: string): boolean => {
+  return SOURCES.find((s) => s.id === sourceId)?.supportsPagination ?? false;
+};
 
 export default function WallpaperList() {
   const {
@@ -380,47 +388,57 @@ export default function WallpaperList() {
         )}
       </main>
 
-      <footer className="h-16 shrink-0 border-t border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-center gap-6 z-20">
+      <footer className="h-16 shrink-0 border-t border-white/5 bg-black/20 backdrop-blur-xl flex items-center justify-between px-6 z-20">
+        <div className="w-24" />
+
+        {supportsPagination(listPageSource) ? (
+          <div className="flex items-center gap-6">
+            <button
+              onClick={handlePrevPage}
+              disabled={page === 1 || loading}
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <div className="w-8 h-8 rounded-lg bg-zinc-800/50 border border-white/5 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
+                <ChevronLeft className="w-4 h-4" />
+              </div>
+              <span className="text-xs font-medium">上一页</span>
+            </button>
+
+            <div className="flex flex-col items-center min-w-[80px]">
+              <span className="text-lg font-bold text-white tabular-nums">
+                {page}
+              </span>
+              <span className="text-[10px] text-zinc-500">
+                / {pagination?.lastPage || 1}
+              </span>
+            </div>
+
+            <button
+              onClick={handleNextPage}
+              disabled={page === (pagination?.lastPage || 1) || loading}
+              className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <span className="text-xs font-medium">下一页</span>
+              <div className="w-8 h-8 rounded-lg bg-zinc-800/50 border border-white/5 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
+                <ChevronRight className="w-4 h-4" />
+              </div>
+            </button>
+          </div>
+        ) : (
+          <div className="text-xs text-zinc-500">
+            {wallpapers.length > 0 && `${wallpapers.length} 张壁纸`}
+          </div>
+        )}
+
         <button
           onClick={handleRefresh}
           disabled={loading}
-          className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all w-24 justify-end"
           title="刷新壁纸列表"
         >
+          <span className="text-xs font-medium">刷新</span>
           <div className="w-8 h-8 rounded-lg bg-zinc-800/50 border border-white/5 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
             <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
-          </div>
-          <span className="text-xs font-medium">刷新</span>
-        </button>
-
-        <button
-          onClick={handlePrevPage}
-          disabled={page === 1 || loading}
-          className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-        >
-          <div className="w-8 h-8 rounded-lg bg-zinc-800/50 border border-white/5 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
-            <ChevronLeft className="w-4 h-4" />
-          </div>
-          <span className="text-xs font-medium">上一页</span>
-        </button>
-
-        <div className="flex flex-col items-center min-w-[80px]">
-          <span className="text-lg font-bold text-white tabular-nums">
-            {page}
-          </span>
-          <span className="text-[10px] text-zinc-500">
-            / {pagination?.lastPage || 1}
-          </span>
-        </div>
-
-        <button
-          onClick={handleNextPage}
-          disabled={page === (pagination?.lastPage || 1) || loading}
-          className="group flex items-center gap-2 px-4 py-2 rounded-xl text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-        >
-          <span className="text-xs font-medium">下一页</span>
-          <div className="w-8 h-8 rounded-lg bg-zinc-800/50 border border-white/5 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors">
-            <ChevronRight className="w-4 h-4" />
           </div>
         </button>
       </footer>
