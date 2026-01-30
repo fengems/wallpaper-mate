@@ -68,7 +68,9 @@ impl Default for WallhavenConfig {
         Self {
             categories: "010".to_string(),
             purity: "100".to_string(),
-            sorting: "random".to_string(),
+            // 使用 toplist 而非 random，确保分页结果稳定
+            // random 模式下每次请求都会返回不同的随机结果
+            sorting: "toplist".to_string(),
             api_key: None,
         }
     }
