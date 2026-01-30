@@ -3,11 +3,13 @@
 ## [Unreleased]
 
 ### Added
+
 - Backend: Bing thumbnail generation with automatic image resizing and caching
 - Frontend: Image error handling with fallback placeholders for failed image loads
 - UI: Radial gradient background to main content areas for visual depth
 
 ### Changed
+
 - Backend: Wallhaven thumbnails now use `thumbs.small` (smaller, faster) instead of `thumbs.large`
 - UI: **Complete design overhaul of Wallpaper Explorer page to match Random Wallpaper page**
 - UI: Unified header design across all pages (h-16, border-zinc-800/50, bg-zinc-950/40)
@@ -23,6 +25,10 @@
 - UI: "Set as Wallpaper" button - reduced visual prominence to match dark theme
 
 ### Fixed
+
+- **Critical**: 修复了随机壁纸页面图片无法显示的问题 (使用 convertFileSrc 处理本地路径)
+- **Critical**: 修复了设置壁纸失败的问题 (Rust 后端枚举序列化大小写不匹配)
+- UI: 全局添加了设置壁纸的操作反馈提示 (Toast)
 - **Critical**: Bing preview modal now shows full-size image instead of thumbnail
 - Wallhaven: Added missing `thumbs.small` field in API response parsing
 - Thumbnail display: Now properly handles images that fail to load
