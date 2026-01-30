@@ -3,7 +3,6 @@ import { fetchWallpapersList, setWallpaper } from '../services/tauri';
 import type {
   WallpaperSource,
   WallpaperListItem,
-  PaginatedResponse,
   WallpaperInfo,
 } from '../types';
 import PreviewModal from '../components/PreviewModal';
@@ -21,7 +20,6 @@ import { cn } from '../lib/utils';
 import { useAppStore } from '../store/appStore';
 import { getCachedImage, setCachedImage } from '../utils/imageCache';
 
-// 统一平台顺序：Bing 在前，Wallhaven 在后
 const SOURCES = [
   {
     id: 'bing' as const,
@@ -46,14 +44,15 @@ const SOURCES = [
 ];
 
 export default function WallpaperList() {
-  const { listPageSource, setListPageSource, favorites, toggleFavorite } =
-    useAppStore();
-  const [wallpapers, setWallpapers] = useState<WallpaperListItem[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [pagination, setPagination] = useState<Omit<
-    PaginatedResponse<any>,
-    'data'
-  > | null>(null);
+  const {
+    listPageSource,
+    setListPageSource,
+    favorites,
+    toggleFavorite,
+    listPageData,
+    setListPageData,
+  } = useAppStore();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [previewWallpaper, setPreviewWallpaper] =
     useState<WallpaperInfo | null>(null);
@@ -62,42 +61,51 @@ export default function WallpaperList() {
   const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<Set<string>>(new Set());
-  const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
-  const fetchWallpapers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetchWallpapersList(
-        listPageSource as WallpaperSource,
-        page
-      );
-      setWallpapers(response.data);
-      setPagination({
-        currentPage: response.currentPage,
-        lastPage: response.lastPage,
-        perPage: response.perPage,
-        total: response.total,
-      });
-      setImageErrors(new Set());
-      setImageLoading(new Set());
-    } catch (_error) {
-      console.error('Failed to fetch wallpapers:', _error);
-      setWallpapers([]);
-      setPagination(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { wallpapers, page, pagination, loaded } = listPageData;
+
+  const fetchWallpapers = useCallback(
+    async (targetPage: number = page) => {
+      setLoading(true);
+      try {
+        const response = await fetchWallpapersList(
+          listPageSource as WallpaperSource,
+          targetPage
+        );
+        setListPageData({
+          wallpapers: response.data,
+          page: response.currentPage,
+          pagination: {
+            currentPage: response.currentPage,
+            lastPage: response.lastPage,
+            perPage: response.perPage,
+            total: response.total,
+          },
+          loaded: true,
+        });
+        setImageErrors(new Set());
+        setImageLoading(new Set());
+      } catch (_error) {
+        console.error('Failed to fetch wallpapers:', _error);
+        setListPageData({
+          wallpapers: [],
+          pagination: null,
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [listPageSource, page, setListPageData]
+  );
 
   useEffect(() => {
-    if (!hasLoaded) {
-      fetchWallpapers();
-      setHasLoaded(true);
+    if (!loaded) {
+      fetchWallpapers(1);
     }
-  }, []);
+  }, [loaded, fetchWallpapers]);
 
   const handleRefresh = () => {
-    fetchWallpapers();
+    fetchWallpapers(page);
   };
 
   const downloadWallpaper = async (item: WallpaperListItem) => {
@@ -127,21 +135,23 @@ export default function WallpaperList() {
 
   const handleSourceChange = (newSource: string) => {
     setListPageSource(newSource);
-    setPage(1);
-    fetchWallpapers();
+    setListPageData({ page: 1 });
+    setTimeout(() => fetchWallpapers(1), 0);
   };
 
   const handlePrevPage = () => {
     if (page > 1) {
-      setPage((prev) => prev - 1);
-      setTimeout(() => fetchWallpapers(), 0);
+      const newPage = page - 1;
+      setListPageData({ page: newPage });
+      setTimeout(() => fetchWallpapers(newPage), 0);
     }
   };
 
   const handleNextPage = () => {
     if (pagination && page < pagination.lastPage) {
-      setPage((prev) => prev + 1);
-      setTimeout(() => fetchWallpapers(), 0);
+      const newPage = page + 1;
+      setListPageData({ page: newPage });
+      setTimeout(() => fetchWallpapers(newPage), 0);
     }
   };
 
@@ -231,14 +241,14 @@ export default function WallpaperList() {
               </p>
             </div>
           </div>
-        ) : hasLoaded && wallpapers.length === 0 ? (
+        ) : loaded && wallpapers.length === 0 ? (
           <div className="relative z-10 flex flex-col justify-center items-center h-full gap-4">
             <div className="w-16 h-16 rounded-2xl bg-zinc-900/50 flex items-center justify-center border border-white/5">
               <ImageIcon className="w-8 h-8 text-zinc-600" />
             </div>
             <p className="text-zinc-500 text-sm">暂无壁纸</p>
           </div>
-        ) : !hasLoaded ? (
+        ) : !loaded ? (
           <div className="relative z-10 flex justify-center items-center h-full">
             <div className="flex flex-col items-center gap-4">
               <div className="w-12 h-12 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />

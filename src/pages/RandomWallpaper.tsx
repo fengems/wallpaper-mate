@@ -21,16 +21,21 @@ const SOURCES = [
 ];
 
 export default function RandomWallpaper() {
-  const { randomPageSource, setRandomPageSource } = useAppStore();
-  const [currentWallpaper, setCurrentWallpaper] =
-    useState<WallpaperInfo | null>(null);
+  const {
+    randomPageSource,
+    setRandomPageSource,
+    randomPageWallpaper,
+    randomPageLoaded,
+    setRandomPageWallpaper,
+    setRandomPageLoaded,
+  } = useAppStore();
+
   const [loading, setLoading] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
-  const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
     if (toast) {
@@ -39,7 +44,6 @@ export default function RandomWallpaper() {
     }
   }, [toast]);
 
-  // 监听 ESC 键关闭全屏预览
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -53,7 +57,7 @@ export default function RandomWallpaper() {
   useEffect(() => {
     const setupListeners = async () => {
       const unlistenFetch = await listen('wallpaper-fetched', (event) => {
-        setCurrentWallpaper(event.payload as WallpaperInfo);
+        setRandomPageWallpaper(event.payload as WallpaperInfo);
         setLoading(false);
       });
 
@@ -69,15 +73,20 @@ export default function RandomWallpaper() {
 
     const cleanup = setupListeners();
 
-    if (!hasLoaded) {
+    if (!randomPageLoaded) {
       fetchNextWallpaper(randomPageSource);
-      setHasLoaded(true);
+      setRandomPageLoaded(true);
     }
 
     return () => {
       cleanup.then((unlisten) => unlisten());
     };
-  }, []);
+  }, [
+    randomPageLoaded,
+    randomPageSource,
+    setRandomPageWallpaper,
+    setRandomPageLoaded,
+  ]);
 
   const fetchNextWallpaper = async (targetSource: string) => {
     setLoading(true);
@@ -101,10 +110,10 @@ export default function RandomWallpaper() {
   };
 
   const handleSetWallpaper = async () => {
-    if (currentWallpaper) {
+    if (randomPageWallpaper) {
       try {
         await invoke('set_wallpaper_from_info', {
-          wallpaper: currentWallpaper,
+          wallpaper: randomPageWallpaper,
         });
       } catch (error) {
         console.error('Failed to set wallpaper:', error);
@@ -126,12 +135,12 @@ export default function RandomWallpaper() {
       <main className="flex-1 min-h-0 relative group p-4 flex items-center justify-center bg-zinc-950/20">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-zinc-900/20 via-zinc-950/50 to-zinc-950 pointer-events-none" />
 
-        {currentWallpaper ? (
+        {randomPageWallpaper ? (
           <div className="relative max-w-full max-h-full flex flex-col items-center justify-center z-10 transition-all duration-500">
             <div className="relative rounded-lg overflow-hidden shadow-2xl shadow-black ring-1 ring-white/10 group-hover:ring-white/20 transition-all duration-500">
               <img
-                src={currentWallpaper.localPath || currentWallpaper.url}
-                alt={currentWallpaper.title}
+                src={randomPageWallpaper.localPath || randomPageWallpaper.url}
+                alt={randomPageWallpaper.title}
                 className={cn(
                   'max-w-full max-h-[calc(92vh-9rem)] w-auto h-auto object-contain transition-all duration-700 ease-out cursor-zoom-in',
                   loading
@@ -144,7 +153,7 @@ export default function RandomWallpaper() {
               <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -translate-y-2 group-hover:translate-y-0">
                 <div className="flex items-center justify-between text-white/90">
                   <span className="text-xs font-medium truncate flex-1 mr-4">
-                    {currentWallpaper.title}
+                    {randomPageWallpaper.title}
                   </span>
                   <button
                     onClick={() => setIsPreviewOpen(true)}
@@ -178,7 +187,7 @@ export default function RandomWallpaper() {
 
         <button
           onClick={handleSetWallpaper}
-          disabled={!currentWallpaper || loading}
+          disabled={!randomPageWallpaper || loading}
           className="flex items-center gap-2 px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-200 text-xs font-medium rounded-lg transition-colors"
         >
           <Download className="w-4 h-4" />
@@ -186,7 +195,7 @@ export default function RandomWallpaper() {
         </button>
       </footer>
 
-      {isPreviewOpen && currentWallpaper && (
+      {isPreviewOpen && randomPageWallpaper && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
           onClick={() => setIsPreviewOpen(false)}
@@ -199,15 +208,15 @@ export default function RandomWallpaper() {
           </button>
 
           <img
-            src={currentWallpaper.url}
-            alt={currentWallpaper.title}
+            src={randomPageWallpaper.url}
+            alt={randomPageWallpaper.title}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
           />
 
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-black/60 backdrop-blur-md rounded-full">
             <p className="text-white/90 text-sm font-medium">
-              {currentWallpaper.title}
+              {randomPageWallpaper.title}
             </p>
           </div>
         </div>
