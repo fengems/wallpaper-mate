@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchWallpapersList, setWallpaper } from '../services/tauri';
+import {
+  fetchWallpapersList,
+  setWallpaper,
+  downloadWallpaper,
+} from '../services/tauri';
 import type {
   WallpaperSource,
   WallpaperListItem,
@@ -15,6 +19,8 @@ import {
   ExternalLink,
   Heart,
   DownloadCloud,
+  Loader2,
+  Check,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAppStore } from '../store/appStore';
@@ -59,6 +65,8 @@ export default function WallpaperList() {
     isFavorite,
     listPageData,
     setListPageData,
+    addDownload,
+    isDownloaded,
   } = useAppStore();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -130,24 +138,36 @@ export default function WallpaperList() {
     fetchWallpapers(page);
   };
 
-  const downloadWallpaper = async (item: WallpaperListItem) => {
+  const handleDownload = async (item: WallpaperListItem) => {
+    if (downloading.has(item.id)) return;
+
     const newDownloading = new Set(downloading);
     newDownloading.add(item.id);
     setDownloading(newDownloading);
 
     try {
-      const response = await fetch(item.url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${item.title}.jpg`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      const wallpaperInfo: WallpaperInfo = {
+        id: item.id,
+        title: item.title,
+        url: item.url,
+        source: item.source,
+        localPath: undefined,
+        cached: false,
+      };
+
+      const localPath = await downloadWallpaper(wallpaperInfo);
+
+      const downloadedInfo: WallpaperInfo = {
+        ...wallpaperInfo,
+        localPath,
+        cached: true,
+      };
+
+      addDownload(downloadedInfo, localPath);
+      setToast({ message: '下载成功', type: 'success' });
     } catch (error) {
       console.error('Download failed:', error);
+      setToast({ message: `下载失败: ${error}`, type: 'error' });
     } finally {
       const newDownloading2 = new Set(downloading);
       newDownloading2.delete(item.id);
@@ -389,18 +409,19 @@ export default function WallpaperList() {
                               toggleFavorite(wallpaperInfo);
                             }}
                           />
-                          <DownloadCloud
-                            className={cn(
-                              'w-3 h-3 cursor-pointer transition-colors',
-                              downloading.has(item.id)
-                                ? 'text-white/80'
-                                : 'text-white/50 hover:text-white/80'
-                            )}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              downloadWallpaper(item);
-                            }}
-                          />
+                          {downloading.has(item.id) ? (
+                            <Loader2 className="w-3 h-3 text-white/80 animate-spin" />
+                          ) : isDownloaded(item.id) ? (
+                            <Check className="w-3 h-3 text-green-400" />
+                          ) : (
+                            <DownloadCloud
+                              className="w-3 h-3 text-white/50 hover:text-white/80 cursor-pointer transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownload(item);
+                              }}
+                            />
+                          )}
                         </div>
                       </div>
                     </div>

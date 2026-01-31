@@ -22,6 +22,10 @@ export async function fetchWallpapersList(
   return invoke('fetch_wallpapers_list', { source, page, apiKey });
 }
 
+export async function downloadWallpaper(info: WallpaperInfo): Promise<string> {
+  return invoke('download_wallpaper', { wallpaper: info });
+}
+
 export async function setWallpaper(info: WallpaperInfo): Promise<void> {
   return invoke('set_wallpaper_from_info', { wallpaper: info });
 }

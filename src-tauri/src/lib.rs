@@ -61,6 +61,7 @@ pub fn run() {
         commands::wallpaper::set_wallpaper_from_info,
         commands::wallpaper::get_current_wallpaper_path,
         commands::wallpaper::fetch_wallpapers_list,
+        commands::wallpaper::download_wallpaper,
         commands::wallpaper::set_auto_switch_config,
         commands::wallpaper::get_auto_switch_config,
         commands::wallpaper::list_downloads,

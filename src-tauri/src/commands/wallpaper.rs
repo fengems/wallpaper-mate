@@ -181,6 +181,18 @@ pub async fn fetch_wallpapers_list(
 }
 
 #[tauri::command]
+pub async fn download_wallpaper(
+    app: AppHandle,
+    wallpaper: WallpaperInfo,
+) -> Result<String, String> {
+    let cached_path = cache::download_and_cache(&app, &wallpaper)
+        .await
+        .map_err(|e| format!("Cache error: {}", e))?;
+
+    Ok(cached_path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
 pub fn set_auto_switch_config(
     source: String,
     enabled: bool,
