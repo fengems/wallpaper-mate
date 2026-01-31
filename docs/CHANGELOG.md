@@ -4,6 +4,8 @@
 
 ### Added
 
+- Backend: 壁纸下载缓存功能（download_wallpaper 命令）
+- Frontend: 下载状态实时显示（加载动画和完成状态图标）
 - Backend: Bing thumbnail generation with automatic image resizing and caching
 - Frontend: Image error handling with fallback placeholders for failed image loads
 - UI: Radial gradient background to main content areas for visual depth
