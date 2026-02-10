@@ -1,4 +1,5 @@
 pub mod commands;
+pub mod config;
 pub mod services;
 pub mod sources;
 pub mod types;

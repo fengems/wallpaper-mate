@@ -1,5 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { Dices, LayoutGrid, Clock, Heart, Download } from 'lucide-react';
+import {
+  Dices,
+  LayoutGrid,
+  Clock,
+  Heart,
+  Download,
+  Settings,
+} from 'lucide-react';
 
 export default function Sidebar() {
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
@@ -25,6 +32,12 @@ export default function Sidebar() {
           <Clock size={22} />
         </NavLink>
       </nav>
+
+      <div className="mt-auto">
+        <NavLink to="/settings" className={navLinkClasses}>
+          <Settings size={22} />
+        </NavLink>
+      </div>
     </aside>
   );
 }

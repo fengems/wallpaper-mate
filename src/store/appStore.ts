@@ -33,6 +33,11 @@ export interface AppState {
   favorites: FavoriteItem[];
   // 下载列表
   downloads: DownloadItem[];
+  // API Keys（持久化存储）
+  wallhavenApiKey: string;
+  unsplashApiKey: string;
+  pixabayApiKey: string;
+  pexelsApiKey: string;
   /* 页面数据 - 不持久化，应用重启时重置 */
   listPageData: ListPageData;
   randomPageWallpaper: WallpaperInfo | null;
@@ -43,6 +48,10 @@ export interface AppActions {
   setRandomPageSource: (source: string) => void;
   setListPageSource: (source: string) => void;
   setSelectedInterval: (interval: number) => void;
+  setWallhavenApiKey: (key: string) => void;
+  setUnsplashApiKey: (key: string) => void;
+  setPixabayApiKey: (key: string) => void;
+  setPexelsApiKey: (key: string) => void;
   // 收藏操作
   toggleFavorite: (wallpaper: WallpaperInfo) => void;
   removeFavorite: (id: string) => void;
@@ -79,6 +88,10 @@ const initialState: Omit<
   selectedInterval: 3600,
   favorites: [],
   downloads: [],
+  wallhavenApiKey: '',
+  unsplashApiKey: '',
+  pixabayApiKey: '',
+  pexelsApiKey: '',
 };
 
 export const useAppStore = create<AppStore>()(
@@ -94,6 +107,11 @@ export const useAppStore = create<AppStore>()(
       setListPageSource: (source) => set({ listPageSource: source }),
 
       setSelectedInterval: (interval) => set({ selectedInterval: interval }),
+
+      setWallhavenApiKey: (key) => set({ wallhavenApiKey: key }),
+      setUnsplashApiKey: (key) => set({ unsplashApiKey: key }),
+      setPixabayApiKey: (key) => set({ pixabayApiKey: key }),
+      setPexelsApiKey: (key) => set({ pexelsApiKey: key }),
 
       // 切换收藏状态
       toggleFavorite: (wallpaper) =>
@@ -196,6 +214,10 @@ export const useAppStore = create<AppStore>()(
         selectedInterval: state.selectedInterval,
         favorites: state.favorites,
         downloads: state.downloads,
+        wallhavenApiKey: state.wallhavenApiKey,
+        unsplashApiKey: state.unsplashApiKey,
+        pixabayApiKey: state.pixabayApiKey,
+        pexelsApiKey: state.pexelsApiKey,
       }),
     }
   )

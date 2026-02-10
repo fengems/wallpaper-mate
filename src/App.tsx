@@ -5,6 +5,7 @@ import WallpaperList from './pages/WallpaperList';
 import Favorites from './pages/Favorites';
 import Downloads from './pages/Downloads';
 import AutoSwitch from './pages/AutoSwitch';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="favorites" element={<Favorites />} />
           <Route path="downloads" element={<Downloads />} />
           <Route path="auto-switch" element={<AutoSwitch />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -9,6 +9,7 @@ import type {
   WallpaperListItem,
   WallpaperInfo,
 } from '../types';
+import { getApiKeyForSource } from '../utils/apiKeys';
 import PreviewModal from '../components/PreviewModal';
 import PageHeader from '../components/PageHeader';
 import {
@@ -50,6 +51,12 @@ const SOURCES = [
     label: 'Pixabay',
     color: 'from-green-500 to-teal-500',
     supportsPagination: false,
+  },
+  {
+    id: 'pexels' as const,
+    label: 'Pexels',
+    color: 'from-cyan-500 to-blue-600',
+    supportsPagination: true,
   },
 ];
 
@@ -98,9 +105,11 @@ export default function WallpaperList() {
     ) => {
       setLoading(true);
       try {
+        const apiKey = getApiKeyForSource(targetSource as WallpaperSource);
         const response = await fetchWallpapersList(
           targetSource as WallpaperSource,
-          targetPage
+          targetPage,
+          apiKey
         );
         setListPageData({
           wallpapers: response.data,

@@ -39,6 +39,7 @@ pub enum WallpaperSource {
     Wallhaven,
     Unsplash,
     Pixabay,
+    Pexels,
     Reddit,
 }
 

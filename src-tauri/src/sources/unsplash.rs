@@ -1,8 +1,9 @@
 use crate::types::{WallpaperInfo, WallpaperListItem, WallpaperSource};
 use serde::Deserialize;
 
+use crate::config::UNSPLASH_ACCESS_KEY;
+
 const UNSPLASH_API_URL: &str = "https://api.unsplash.com";
-const UNSPLASH_ACCESS_KEY: &str = "YOUR_ACCESS_KEY";
 
 #[derive(Debug, Deserialize)]
 struct UnsplashPhoto {
@@ -35,6 +36,7 @@ struct UnsplashResponse {
 pub struct UnsplashConfig {
     pub query: Option<String>,
     pub orientation: Option<String>,
+    pub access_key: Option<String>,
 }
 
 impl Default for UnsplashConfig {
@@ -42,6 +44,7 @@ impl Default for UnsplashConfig {
         Self {
             query: Some("wallpaper".to_string()),
             orientation: Some("landscape".to_string()),
+            access_key: None,
         }
     }
 }
@@ -58,9 +61,11 @@ pub async fn fetch_wallpapers(
         .append_pair("orientation", config.orientation.as_deref().unwrap_or("landscape"))
         .append_pair("per_page", "20");
 
+    let auth_header = format!("Client-ID {}", UNSPLASH_ACCESS_KEY);
+
     let response = client
         .get(url)
-        .header("Authorization", format!("Client-ID {}", UNSPLASH_ACCESS_KEY))
+        .header("Authorization", auth_header)
         .send()
         .await?;
 
@@ -101,9 +106,17 @@ pub async fn fetch_wallpapers_paginated(
         .append_pair("per_page", "20")
         .append_pair("page", &page.to_string());
 
+    let auth_header = config
+        .access_key
+        .as_ref()
+        .map(|k| format!("Client-ID {}", k))
+        .unwrap_or_else(|| {
+            format!("Client-ID {}", UNSPLASH_ACCESS_KEY)
+        });
+
     let response = client
         .get(url)
-        .header("Authorization", format!("Client-ID {}", UNSPLASH_ACCESS_KEY))
+        .header("Authorization", auth_header)
         .send()
         .await?;
 

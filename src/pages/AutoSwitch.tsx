@@ -8,12 +8,29 @@ import {
   getAutoSwitchConfig,
   fetchNextWallpaper,
 } from '../services/tauri';
+import { getApiKeyForSource } from '../utils/apiKeys';
 
 const SOURCES = [
-  { id: 'bing', label: 'Bing Daily', color: 'from-blue-500 to-cyan-500' },
-  { id: 'wallhaven', label: 'Wallhaven', color: 'from-orange-500 to-red-600' },
-  { id: 'unsplash', label: 'Unsplash', color: 'from-purple-500 to-pink-500' },
-  { id: 'pixabay', label: 'Pixabay', color: 'from-green-500 to-teal-500' },
+  {
+    id: 'bing',
+    label: 'Bing Daily',
+    color: 'from-blue-500 to-cyan-500',
+  },
+  {
+    id: 'wallhaven',
+    label: 'Wallhaven',
+    color: 'from-orange-500 to-red-600',
+  },
+  {
+    id: 'unsplash',
+    label: 'Unsplash',
+    color: 'from-purple-500 to-pink-500',
+  },
+  {
+    id: 'pixabay',
+    label: 'Pixabay',
+    color: 'from-green-500 to-teal-500',
+  },
 ];
 
 const INTERVALS = [
@@ -75,7 +92,8 @@ export default function AutoSwitch() {
 
     const timer = setInterval(async () => {
       try {
-        await fetchNextWallpaper(source, null);
+        const apiKey = getApiKeyForSource(source);
+        await fetchNextWallpaper(source, apiKey);
       } catch (error) {
         console.error('Auto switch failed:', error);
       }

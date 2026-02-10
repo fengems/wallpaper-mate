@@ -12,12 +12,34 @@ import { cn } from '../lib/utils';
 import PageHeader from '../components/PageHeader';
 import type { WallpaperInfo } from '../types';
 import { useAppStore } from '../store/appStore';
+import { getApiKeyForSource } from '../utils/apiKeys';
 
 const SOURCES = [
-  { id: 'bing', label: 'Bing Daily', color: 'from-blue-500 to-cyan-500' },
-  { id: 'wallhaven', label: 'Wallhaven', color: 'from-orange-500 to-red-600' },
-  { id: 'unsplash', label: 'Unsplash', color: 'from-purple-500 to-pink-500' },
-  { id: 'pixabay', label: 'Pixabay', color: 'from-green-500 to-teal-500' },
+  {
+    id: 'bing',
+    label: 'Bing Daily',
+    color: 'from-blue-500 to-cyan-500',
+  },
+  {
+    id: 'wallhaven',
+    label: 'Wallhaven',
+    color: 'from-orange-500 to-red-600',
+  },
+  {
+    id: 'unsplash',
+    label: 'Unsplash',
+    color: 'from-purple-500 to-pink-500',
+  },
+  {
+    id: 'pixabay',
+    label: 'Pixabay',
+    color: 'from-green-500 to-teal-500',
+  },
+  {
+    id: 'pexels',
+    label: 'Pexels',
+    color: 'from-cyan-500 to-blue-600',
+  },
 ];
 
 export default function RandomWallpaper() {
@@ -91,9 +113,10 @@ export default function RandomWallpaper() {
   const fetchNextWallpaper = async (targetSource: string) => {
     setLoading(true);
     try {
+      const apiKey = getApiKeyForSource(targetSource);
       await invoke('fetch_next_wallpaper', {
         source: targetSource,
-        apiKey: null,
+        api_key: apiKey,
       });
     } catch (error) {
       console.error('Failed to fetch wallpaper:', error);

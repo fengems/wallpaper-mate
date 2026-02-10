@@ -3,6 +3,7 @@ export const WallpaperSource = {
   Wallhaven: 'wallhaven',
   Unsplash: 'unsplash',
   Pixabay: 'pixabay',
+  Pexels: 'pexels',
   Reddit: 'reddit',
 } as const;
 
@@ -37,6 +38,9 @@ export interface PaginatedResponse<T> {
 export interface Settings {
   source: WallpaperSource;
   wallhavenApiKey?: string;
+  unsplashApiKey?: string;
+  pixabayApiKey?: string;
+  pexelsApiKey?: string;
 }
 
 export type WallpaperEvent =

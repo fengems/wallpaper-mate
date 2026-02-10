@@ -1,8 +1,9 @@
 use crate::types::{WallpaperInfo, WallpaperListItem, WallpaperSource};
 use serde::Deserialize;
 
-const PIXABAY_API_URL: &str = "https://pixabay.com/api";
-const PIXABAY_API_KEY: &str = "YOUR_API_KEY";
+use crate::config::PIXABAY_API_KEY;
+
+const PIXABAY_API_URL: &str = "https://pixabay.com/api/";
 
 #[derive(Debug, Deserialize)]
 struct PixabayPhoto {
@@ -23,6 +24,7 @@ struct PixabayResponse {
 
 pub struct PixabayConfig {
     pub query: Option<String>,
+    pub category: Option<String>,
     pub image_type: Option<String>,
     pub safesearch: Option<bool>,
 }
@@ -31,6 +33,7 @@ impl Default for PixabayConfig {
     fn default() -> Self {
         Self {
             query: Some("wallpaper".to_string()),
+            category: None,
             image_type: Some("photo".to_string()),
             safesearch: Some(true),
         }
@@ -90,7 +93,7 @@ pub async fn fetch_wallpapers_paginated(
         .append_pair("image_type", config.image_type.as_deref().unwrap_or("photo"))
         .append_pair("per_page", "20")
         .append_pair("page", &page.to_string())
-        .append_pair("safesearch", &config.safesearch.unwrap_or(true).to_string())
+        .append_pair("safesearch", "true")
         .append_pair("min_width", "1920")
         .append_pair("min_height", "1080");
 

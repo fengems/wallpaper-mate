@@ -29,6 +29,7 @@ pub async fn download_and_cache<R: tauri::Runtime>(
         WallpaperSource::Wallhaven => "wallhaven",
         WallpaperSource::Unsplash => "unsplash",
         WallpaperSource::Pixabay => "pixabay",
+        WallpaperSource::Pexels => "pexels",
         WallpaperSource::Reddit => "reddit",
     });
 

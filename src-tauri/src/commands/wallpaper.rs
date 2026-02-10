@@ -1,5 +1,7 @@
 use crate::services::{cache, wallpaper, scheduler};
 use crate::types::{PaginatedResponse, WallpaperInfo, WallpaperListItem, WallpaperSource};
+use crate::sources::provider::{fetch_paginated, fetch_random, ProviderError};
+
 use tauri::{AppHandle, Emitter};
 use rand::prelude::IndexedRandom;
 
@@ -10,9 +12,16 @@ impl WallpaperSource {
             "wallhaven" => Some(WallpaperSource::Wallhaven),
             "unsplash" => Some(WallpaperSource::Unsplash),
             "pixabay" => Some(WallpaperSource::Pixabay),
+            "pexels" => Some(WallpaperSource::Pexels),
             "reddit" => Some(WallpaperSource::Reddit),
             _ => None,
         }
+    }
+}
+
+impl From<ProviderError> for String {
+    fn from(err: ProviderError) -> Self {
+        err.to_string()
     }
 }
 
@@ -22,43 +31,11 @@ pub async fn fetch_next_wallpaper(
     source: String,
     api_key: Option<String>,
 ) -> Result<WallpaperInfo, String> {
-    let wallpaper_source = match source.as_str() {
-        "bing" => WallpaperSource::Bing,
-        "wallhaven" => WallpaperSource::Wallhaven,
-        _ => {
-            return Err("Invalid source".to_string());
-        }
-    };
+    let wallpaper_source = WallpaperSource::from_str(&source)
+        .ok_or("Invalid source".to_string())?;
 
-    let wallpapers = match wallpaper_source {
-        WallpaperSource::Bing => {
-            crate::sources::bing::fetch_wallpapers()
-                .await
-                .map_err(|e| format!("Bing API error: {}", e))?
-        }
-        WallpaperSource::Wallhaven => {
-            let config = crate::sources::wallhaven::WallhavenConfig {
-                api_key: api_key.clone(),
-                ..Default::default()
-            };
-            crate::sources::wallhaven::search_wallpapers(Some(config))
-                .await
-                .map_err(|e| format!("Wallhaven API error: {}", e))?
-        }
-        WallpaperSource::Unsplash => {
-            crate::sources::unsplash::fetch_wallpapers(None)
-                .await
-                .map_err(|e| format!("Unsplash API error: {}", e))?
-        }
-        WallpaperSource::Pixabay => {
-            crate::sources::pixabay::fetch_wallpapers(None)
-                .await
-                .map_err(|e| format!("Pixabay API error: {}", e))?
-        }
-        WallpaperSource::Reddit => {
-            return Err("Reddit source not implemented yet".to_string());
-        }
-    };
+    let wallpapers = fetch_random(wallpaper_source.clone(), api_key.clone()).await
+        .map_err(|e| e.to_string())?;
 
     if wallpapers.is_empty() {
         return Err("No wallpapers found".to_string());
@@ -76,7 +53,7 @@ pub async fn fetch_next_wallpaper(
                     .map(|s| format!("({})", s.trim_end_matches(')')))
                     .unwrap_or_default();
                 selected.title = format!("{} {}", title_tags, resolution);
-                
+
                 if let Some(c) = selected.title.get_mut(0..1) {
                     c.make_ascii_uppercase();
                 }
@@ -139,45 +116,11 @@ pub async fn fetch_wallpapers_list(
     page: u32,
     api_key: Option<String>,
 ) -> Result<PaginatedResponse<WallpaperListItem>, String> {
-    let wallpaper_source = match source.as_str() {
-        "bing" => WallpaperSource::Bing,
-        "wallhaven" => WallpaperSource::Wallhaven,
-        _ => {
-            return Err("Invalid source".to_string());
-        }
-    };
+    let wallpaper_source = WallpaperSource::from_str(&source)
+        .ok_or("Invalid source".to_string())?;
 
-    let result = match wallpaper_source {
-        WallpaperSource::Bing => {
-            crate::sources::bing::fetch_wallpapers_as_list(page)
-                .await
-                .map_err(|e| format!("Bing API error: {}", e))?
-        }
-        WallpaperSource::Wallhaven => {
-            let config = crate::sources::wallhaven::WallhavenConfig {
-                api_key: api_key.clone(),
-                ..Default::default()
-            };
-            crate::sources::wallhaven::search_wallpapers_paginated(Some(config), page)
-                .await
-                .map_err(|e| format!("Wallhaven API error: {}", e))?
-        }
-        WallpaperSource::Unsplash => {
-            crate::sources::unsplash::fetch_wallpapers_paginated(None, page)
-                .await
-                .map_err(|e| format!("Unsplash API error: {}", e))?
-        }
-        WallpaperSource::Pixabay => {
-            crate::sources::pixabay::fetch_wallpapers_paginated(None, page)
-                .await
-                .map_err(|e| format!("Pixabay API error: {}", e))?
-        }
-        WallpaperSource::Reddit => {
-            return Err("Reddit source not implemented yet".to_string());
-        }
-    };
-
-    Ok(result)
+    fetch_paginated(wallpaper_source, api_key, page).await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

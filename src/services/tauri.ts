@@ -11,7 +11,7 @@ export async function fetchNextWallpaper(
   source: WallpaperSource,
   apiKey: string | null = null
 ): Promise<WallpaperInfo> {
-  return invoke('fetch_next_wallpaper', { source, apiKey });
+  return invoke('fetch_next_wallpaper', { source, api_key: apiKey });
 }
 
 export async function fetchWallpapersList(
@@ -19,7 +19,7 @@ export async function fetchWallpapersList(
   page: number,
   apiKey: string | null = null
 ): Promise<PaginatedResponse<WallpaperListItem>> {
-  return invoke('fetch_wallpapers_list', { source, page, apiKey });
+  return invoke('fetch_wallpapers_list', { source, page, api_key: apiKey });
 }
 
 export async function downloadWallpaper(info: WallpaperInfo): Promise<string> {
@@ -31,7 +31,12 @@ export async function setWallpaper(info: WallpaperInfo): Promise<void> {
 }
 
 export async function getSettings(): Promise<Settings> {
-  return { source: 'bing' };
+  try {
+    const settings = await invoke<Settings>('get_settings');
+    return settings || { source: 'bing' };
+  } catch {
+    return { source: 'bing' };
+  }
 }
 
 export async function saveSettings(_settings: Settings): Promise<void> {}

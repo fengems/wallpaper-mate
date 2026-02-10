@@ -6,6 +6,7 @@ interface Source {
   id: string;
   label: string;
   color: string;
+  supportsPagination?: boolean;
 }
 
 interface PageHeaderProps {
@@ -24,11 +25,10 @@ export default function PageHeader({
   onSourceChange,
 }: PageHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+
   const selectedSource = sources.find((s) => s.id === currentSource);
 
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+  const handleToggle = () => setIsOpen(!isOpen);
 
   const handleSelect = (sourceId: string) => {
     onSourceChange(sourceId);
@@ -90,14 +90,14 @@ export default function PageHeader({
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 top-full mt-1.5 w-40 bg-zinc-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50">
+          <div className="absolute right-0 top-full mt-1.5 w-56 bg-zinc-800/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 z-50">
             <div className="p-1">
               {sources.map((source) => (
                 <button
                   key={source.id}
                   onClick={() => handleSelect(source.id)}
                   className={cn(
-                    'w-full flex items-center justify-between px-4 h-10 text-xs rounded-lg transition-colors',
+                    'w-full flex items-center justify-between px-4 h-10 text-xs rounded-lg transition-colors mb-1 last:mb-0',
                     source.id === currentSource
                       ? 'bg-gradient-to-r text-white from-indigo-500 to-purple-500'
                       : 'text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-200'
